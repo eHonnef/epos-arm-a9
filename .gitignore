@@ -1,0 +1,14 @@
+*.o
+*.conf
+bin/*
+lib/*
+img/*
+!img/makefile
+*_traits*
+**/pc_boot
+**/pc_boot.s
+**/pc_setup.s
+**/pc_setup
+tools/eposmkbi/eposmkbi
+app/*
+!app/*.cc
