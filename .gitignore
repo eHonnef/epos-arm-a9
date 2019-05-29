@@ -12,3 +12,4 @@ img/*
 tools/eposmkbi/eposmkbi
 app/*
 !app/*.cc
+!app/makefile
