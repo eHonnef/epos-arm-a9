@@ -26,7 +26,7 @@ Em ordem de prioridade:
   - [ ] gpio_pull_down *
   - [ ] gpio_floating *
   - [ ] scr *
-  - [ ] systick
+  - [ ] systick *
   - [ ] tsc *
   - [ ] timer0 *
   - [ ] timer1 *
@@ -52,3 +52,4 @@ Em ordem de prioridade:
 - WFI (wait for interrupt) é o equivalente ao HALT do x86.
 - `pc_setup.cc` linhas 420-427, aparentemente reserva espaço de memória para as entidades que serão utilizadas durante o setup.
 - `src/init/init_system.cc` esse arquivo é importante... por algum motivo.
+- O erro de `out of memory` acontece na função `alloc` de heap.h, aparentemente ele não ta encontrando um bloco de memória livre.

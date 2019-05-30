@@ -37,7 +37,7 @@ struct Traits
     static const bool enabled = true;
     static const bool debugged = true;
     static const bool emulated = true;
-    static const bool hysterically_debugged = false;
+    static const bool hysterically_debugged = true;
 
     typedef LIST<> DEVICES;
     typedef TLIST<> ASPECTS;
@@ -46,9 +46,9 @@ struct Traits
 template<> struct Traits<Build>: public Traits<void>
 {
     static const unsigned int MODE = LIBRARY;
-    static const unsigned int ARCHITECTURE = IA32;
-    static const unsigned int MACHINE = PC;
-    static const unsigned int MODEL = Legacy_PC;
+    static const unsigned int ARCHITECTURE = ARMv7;
+    static const unsigned int MACHINE = Cortex_M;
+    static const unsigned int MODEL = LM3S811;
     static const unsigned int CPUS = 1;
     static const unsigned int NODES = 1; // > 1 => NETWORKING
 };
