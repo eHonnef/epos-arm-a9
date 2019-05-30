@@ -37,7 +37,7 @@ struct Traits
     static const bool enabled = true;
     static const bool debugged = true;
     static const bool emulated = true;
-    static const bool hysterically_debugged = false;
+    static const bool hysterically_debugged = true;
 
     typedef LIST<> DEVICES;
     typedef TLIST<> ASPECTS;
