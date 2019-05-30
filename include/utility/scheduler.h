@@ -41,6 +41,30 @@ namespace Scheduling_Criteria
         volatile int _priority;
     };
 
+    // Feedback
+    class FB: public Priority
+    {
+    public:
+        enum {
+            MAIN   = 0,
+            NORMAL = 1,
+            IDLE   = (unsigned(1) << (sizeof(int) * 8 - 1)) - 1
+        };
+
+        static const bool timed = true;
+        static const bool dynamic = true;
+        static const bool preemptive = true;
+
+    public:
+        FB(int p = NORMAL): Priority(p) {}
+
+        FB operator+=(const FB & p) { 
+            _priority += p._priority;
+            return *this;
+        }
+
+    };
+
     // Round-Robin
     class RR: public Priority
     {

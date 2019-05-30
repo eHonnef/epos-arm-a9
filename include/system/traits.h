@@ -37,7 +37,7 @@ struct Traits
     static const bool enabled = true;
     static const bool debugged = true;
     static const bool emulated = true;
-    static const bool hysterically_debugged = true;
+    static const bool hysterically_debugged = false;
 
     typedef LIST<> DEVICES;
     typedef TLIST<> ASPECTS;
@@ -46,9 +46,9 @@ struct Traits
 template<> struct Traits<Build>: public Traits<void>
 {
     static const unsigned int MODE = LIBRARY;
-    static const unsigned int ARCHITECTURE = ARMv7;
-    static const unsigned int MACHINE = Cortex_M;
-    static const unsigned int MODEL = LM3S811;
+    static const unsigned int ARCHITECTURE = IA32;
+    static const unsigned int MACHINE = PC;
+    static const unsigned int MODEL = Legacy_PC;
     static const unsigned int CPUS = 1;
     static const unsigned int NODES = 1; // > 1 => NETWORKING
 };
@@ -145,7 +145,7 @@ template<> struct Traits<System>: public Traits<void>
 
 template<> struct Traits<Thread>: public Traits<void>
 {
-    typedef Scheduling_Criteria::Priority Criterion;
+    typedef Scheduling_Criteria::FB Criterion;
     static const unsigned int QUANTUM = 10000; // us
     static const bool trace_idle = hysterically_debugged;
 };
