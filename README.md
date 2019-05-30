@@ -11,7 +11,31 @@ Em ordem de prioridade:
 
 - [x] Fazer o escalonador funcionar.
 - [ ] Verificar porque a LM3S811 dá erro de `out of memory`. Porque acho que vai acontecer também com a realview se não resolver nela primeiro.
-- [ ] Mapear a memória da realview no respectivo arquivo `include/cortex_a/realview`. [Link referência](http://infocenter.arm.com/help/topic/com.arm.doc.dui0440b/index.html).
+- [x] Mapear a memória da realview no respectivo arquivo `include/cortex_a/realview`. [Link referência](http://infocenter.arm.com/help/topic/com.arm.doc.dui0440b/index.html).
+  - Alguns endereços não existem / não encontrei
+- Implementar de acordo com realview os seguintes métodos em `include/cortex_a/realview_pbx.h`:
+  - [ ] reboot
+  - [ ] delay
+  - [ ] enable_uart
+  - [ ] power_uart
+  - [ ] power_user_timer
+  - [ ] power_usb
+  - [ ] gpio_init
+  - [ ] power_gpio
+  - [ ] gpio_pull_up *
+  - [ ] gpio_pull_down *
+  - [ ] gpio_floating *
+  - [ ] scr *
+  - [ ] systick
+  - [ ] tsc *
+  - [ ] timer0 *
+  - [ ] timer1 *
+  - [ ] gpioa *
+  - [ ] gpiob *
+  - [ ] gpioc *
+  - [ ] gpiod *
+  - [ ] gpio *
+- \* "basta" fazer deslocamento de bits. (a.k.a. escovamento de bits).
 - [ ] Implementar o Timer_init
   - Seguir a base do cortex-m
 - [ ] Interrupções:

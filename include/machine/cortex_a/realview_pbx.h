@@ -20,35 +20,37 @@ protected:
 
 public:
     static const unsigned int IRQS = 30;
-    static const unsigned int TIMERS = 5;
-    static const unsigned int UARTS = 2;
-    static const unsigned int GPIO_PORTS = 5;
+    static const unsigned int TIMERS = 4; // 4 timers
+    static const unsigned int UARTS = 4; // 4
+    static const unsigned int GPIO_PORTS = 3; // 3
     static const bool supports_gpio_power_up = false;
 
     // Base addresses for memory-mapped I/O devices
     enum {
-        WDT0_BASE                   = 0x40000000, // Watchdog Timer
+        WDT0_BASE                   = 0x1000F000, // Watchdog Timer
         I2C0_BASE                   = 0x40002000, // I2C
-        GPIOA_BASE                  = 0x40004000, // PrimeCell PL061 GPIO
-        GPIOB_BASE                  = 0x40005000, // PrimeCell PL061 GPIO
-        GPIOC_BASE                  = 0x40006000, // PrimeCell PL061 GPIO
-        GPIOD_BASE                  = 0x40007000, // PrimeCell PL061 GPIO
-        USART_BASE                  = 0x40008000, // PrimeCell PL022 Synchronous Serial Port
-        UART0_BASE                  = 0x4000c000, // PrimeCell PL011 UART
-        UART1_BASE                  = 0x4000d000, // PrimeCell PL011 UART
-        I2C1_BASE                   = 0x40020000, // I2C
-        I2C2_BASE                   = 0x40021000, // I2C
-        GPIOE_BASE                  = 0x40024000, // PrimeCell PL061 GPIO
-        TIMER0_BASE                 = 0x40030000, // GPTM
-        TIMER1_BASE                 = 0x40031000, // GPTM
-        TIMER2_BASE                 = 0x40032000, // GPTM
-        TIMER3_BASE                 = 0,          // Not present
-        ADC0_BASE                   = 0x40038000, // ADC
-        FLASH0_BASE                 = 0x400fd000, // Flash Controller
-        SCR_BASE                    = 0x400fe000, // System Control
-        IC0_BASE                    = 0xe000e000, // NVIC
-        TIMER4_BASE                 = 0xe000e010, // SysTick
-        IC1_BASE                    = 0xe000e0f0, // NVIC
+        GPIOA_BASE                  = 0x10013000, // PrimeCell PL061 GPIO (aka General Purpose Input/Output)
+        GPIOB_BASE                  = 0x10014000, // PrimeCell PL061 GPIO
+        GPIOC_BASE                  = 0x10015000, // PrimeCell PL061 GPIO
+        GPIOD_BASE                  = 0, // PrimeCell PL061 GPIO
+        USART_BASE                  = 0x1000D000, // PrimeCell PL022 Synchronous Serial Port (ssp)
+        UART0_BASE                  = 0x10009000, // PrimeCell PL011 UART
+        UART1_BASE                  = 0x1000A000, // PrimeCell PL011 UART
+        UART2_BASE                  = 0x1000B000, // PrimeCell PL011 UART
+        UART3_BASE                  = 0x1000C000, // PrimeCell PL011 UART
+        I2C1_BASE                   = 0, // I2C (nao presente (?))
+        I2C2_BASE                   = 0, // I2C
+        GPIOE_BASE                  = 0, // PrimeCell PL061 GPIO
+        TIMER0_BASE                 = 0x10011000, // GPTM (aka general purpose timer module)
+        TIMER1_BASE                 = 0x10012000, // GPTM
+        TIMER2_BASE                 = 0x10018000, // GPTM
+        TIMER3_BASE                 = 0x10019000, //
+        ADC0_BASE                   = 0, // ADC (nao presente ?)
+        FLASH0_BASE                 = 0x18000300, // Flash Controller (pode ser tambem a 0x1000004C)
+        SCR_BASE                    = 0x10001000, // System Control (pode ser tambem 0x1001A000)
+        IC0_BASE                    = 0, // NVIC
+        TIMER4_BASE                 = 0, // SysTick
+        IC1_BASE                    = 0, // NVIC
     };
 
     // System Control Registers offsets to SCR_BASE
