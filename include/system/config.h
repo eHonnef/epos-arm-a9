@@ -11,7 +11,7 @@
 #define ARCH armv7
 #define MACH cortex_m
 #define MMOD lm3s811
-#define APPL fb_sched_test
+#define APPL hello
 #define __mode_library__
 #define __arch_armv7__
 #define __mach_cortex_m__
