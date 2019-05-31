@@ -24,7 +24,7 @@ public:
     static const unsigned int UARTS = 4; // 4
     static const unsigned int GPIO_PORTS = 3; // 3
     static const bool supports_gpio_power_up = false;
-
+/*
     // Base addresses for memory-mapped I/O devices
     enum {
         WDT0_BASE                   = 0x1000F000, // Watchdog Timer
@@ -53,7 +53,43 @@ public:
         // TIMER4_BASE                 = 0, // SysTick
         // IC1_BASE                    = 0, // NVIC
     };
+*/
+// Base addresses for memory-mapped I/O devices
+// https://wiki.osdev.org/User:Pancakes/arm_qemu_realview-pb-a e https://github.com/qemu/qemu/blob/master/hw/arm/realview.c
+    enum {
+        SYSREG_BASE                 = 0x10000000, // system registers
+        AACI_BASE                   = 0x10004000, // aaci
+        MCI_BASE                    = 0x10004000, // mci
+        WDT0_BASE                   = 0x1000F000, // Watchdog Timer
+        GPIOA_BASE                  = 0x10013000, // PrimeCell PL061 GPIO (aka General Purpose Input/Output)
+        GPIOB_BASE                  = 0x10014000, // PrimeCell PL061 GPIO
+        GPIOC_BASE                  = 0x10015000, // PrimeCell PL061 GPIO
+        USART_BASE                  = 0x1000D000, // PrimeCell PL022 Synchronous Serial Port (ssp)
+        UART0_BASE                  = 0x10009000, // PrimeCell PL011 UART
+        UART1_BASE                  = 0x1000A000, // PrimeCell PL011 UART
+        UART2_BASE                  = 0x1000B000, // PrimeCell PL011 UART
+        UART3_BASE                  = 0x1000C000, // PrimeCell PL011 UART
+        TIMER0_BASE                 = 0x10011000, // GPTM (aka general purpose timer module)
+        TIMER1_BASE                 = 0x10012000, // GPTM
+        TIMER2_BASE                 = 0x10018000, // GPTM
+        TIMER3_BASE                 = 0x10019000, // GPTM
+        RTC_BASE                    = 0x10017000, // rtc
+        FLASH0_BASE                 = 0x18000300, // Flash Controller (pode ser tambem a 0x1000004C)
+        FLASHCFG_BASE               = 0x4c000000, // Flash CONFIGURATION
+        SCR_BASE0                   = 0x10001000, // System Control (pode ser tambem 0x1001A000)
+        SCR_BASE1                   = 0x1001A000, // System Control (pode ser tambem 0x1001A000)
+        PER_BASE                    = 0x1f000000, // peripheal base
+    };
 
+    // Offsets para PER_BASE
+    enum {
+        SCUOFF = 0x0000,	// snoop control unit
+        GICOFF = 0x0100,	// general interrupt controller
+        GTIOFF = 0x0200,	// global timer
+        PTIOFF = 0x0600,	// private timer
+        GDIOFF = 0x1000,	// GIC distributor
+    };
+    
     // System Control Registers offsets to SCR_BASE
     enum {                              // Description                                          Type    Value after reset
         DID0            = 0x000,        // Device Identification 0                              ro      -
@@ -487,9 +523,9 @@ protected:
 
 public:
     static volatile Reg32 & scr(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(SCR_BASE)[o / sizeof(Reg32)]; }
-    // static volatile Reg32 & scs(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(IC0_BASE)[o / sizeof(Reg32)]; }
+    static volatile Reg32 & scs(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(IC0_BASE)[o / sizeof(Reg32)]; }
 
-    static volatile Reg32 & systick(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(TIMER4_BASE)[o / sizeof(Reg32)]; }
+    static volatile Reg32 & systick(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(PER_BASE + GTIOFF)[o / sizeof(Reg32)]; }
     static volatile Reg32 & tsc(unsigned int o)     { return reinterpret_cast<volatile Reg32 *>(TIMER1_BASE)[o / sizeof(Reg32)]; }
     static volatile Reg32 & timer0(unsigned int o)  { return reinterpret_cast<volatile Reg32 *>(TIMER0_BASE)[o / sizeof(Reg32)]; }
     static volatile Reg32 & timer1(unsigned int o)  { return reinterpret_cast<volatile Reg32 *>(TIMER2_BASE)[o / sizeof(Reg32)]; }
