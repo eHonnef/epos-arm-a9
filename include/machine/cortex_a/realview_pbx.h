@@ -28,29 +28,30 @@ public:
     // Base addresses for memory-mapped I/O devices
     enum {
         WDT0_BASE                   = 0x1000F000, // Watchdog Timer
-        I2C0_BASE                   = 0x40002000, // I2C
+        // I2C0_BASE                   = 0x40002000, // I2C
         GPIOA_BASE                  = 0x10013000, // PrimeCell PL061 GPIO (aka General Purpose Input/Output)
         GPIOB_BASE                  = 0x10014000, // PrimeCell PL061 GPIO
         GPIOC_BASE                  = 0x10015000, // PrimeCell PL061 GPIO
-        GPIOD_BASE                  = 0, // PrimeCell PL061 GPIO
+        // GPIOD_BASE                  = 0, // PrimeCell PL061 GPIO
         USART_BASE                  = 0x1000D000, // PrimeCell PL022 Synchronous Serial Port (ssp)
         UART0_BASE                  = 0x10009000, // PrimeCell PL011 UART
         UART1_BASE                  = 0x1000A000, // PrimeCell PL011 UART
         UART2_BASE                  = 0x1000B000, // PrimeCell PL011 UART
         UART3_BASE                  = 0x1000C000, // PrimeCell PL011 UART
-        I2C1_BASE                   = 0, // I2C (nao presente (?))
-        I2C2_BASE                   = 0, // I2C
-        GPIOE_BASE                  = 0, // PrimeCell PL061 GPIO
+        // I2C1_BASE                   = 0, // I2C (nao presente (?))
+        // I2C2_BASE                   = 0, // I2C
+        // GPIOE_BASE                  = 0, // PrimeCell PL061 GPIO
         TIMER0_BASE                 = 0x10011000, // GPTM (aka general purpose timer module)
         TIMER1_BASE                 = 0x10012000, // GPTM
         TIMER2_BASE                 = 0x10018000, // GPTM
         TIMER3_BASE                 = 0x10019000, //
-        ADC0_BASE                   = 0, // ADC (nao presente ?)
+        // ADC0_BASE                   = 0, // ADC (nao presente ?)
         FLASH0_BASE                 = 0x18000300, // Flash Controller (pode ser tambem a 0x1000004C)
-        SCR_BASE                    = 0x10001000, // System Control (pode ser tambem 0x1001A000)
-        IC0_BASE                    = 0, // NVIC
-        TIMER4_BASE                 = 0, // SysTick
-        IC1_BASE                    = 0, // NVIC
+        SCR_BASE0                   = 0x10001000, // System Control (pode ser tambem 0x1001A000)
+        SCR_BASE1                   = 0x1001A000, // System Control (pode ser tambem 0x1001A000)
+        // IC0_BASE                    = 0, // NVIC
+        // TIMER4_BASE                 = 0, // SysTick
+        // IC1_BASE                    = 0, // NVIC
     };
 
     // System Control Registers offsets to SCR_BASE
@@ -486,7 +487,7 @@ protected:
 
 public:
     static volatile Reg32 & scr(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(SCR_BASE)[o / sizeof(Reg32)]; }
-    static volatile Reg32 & scs(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(IC0_BASE)[o / sizeof(Reg32)]; }
+    // static volatile Reg32 & scs(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(IC0_BASE)[o / sizeof(Reg32)]; }
 
     static volatile Reg32 & systick(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(TIMER4_BASE)[o / sizeof(Reg32)]; }
     static volatile Reg32 & tsc(unsigned int o)     { return reinterpret_cast<volatile Reg32 *>(TIMER1_BASE)[o / sizeof(Reg32)]; }
@@ -495,8 +496,8 @@ public:
     static volatile Reg32 & gpioa(unsigned int o)   { return reinterpret_cast<volatile Reg32 *>(GPIOA_BASE)[o / sizeof(Reg32)]; }
     static volatile Reg32 & gpiob(unsigned int o)   { return reinterpret_cast<volatile Reg32 *>(GPIOB_BASE)[o / sizeof(Reg32)]; }
     static volatile Reg32 & gpioc(unsigned int o)   { return reinterpret_cast<volatile Reg32 *>(GPIOC_BASE)[o / sizeof(Reg32)]; }
-    static volatile Reg32 & gpiod(unsigned int o)   { return reinterpret_cast<volatile Reg32 *>(GPIOD_BASE)[o / sizeof(Reg32)]; }
-    static volatile Reg32 & gpioe(unsigned int o)   { return reinterpret_cast<volatile Reg32 *>(GPIOE_BASE)[o / sizeof(Reg32)]; }
+    // static volatile Reg32 & gpiod(unsigned int o)   { return reinterpret_cast<volatile Reg32 *>(GPIOD_BASE)[o / sizeof(Reg32)]; }
+    // static volatile Reg32 & gpioe(unsigned int o)   { return reinterpret_cast<volatile Reg32 *>(GPIOE_BASE)[o / sizeof(Reg32)]; }
     static volatile Reg32 & gpio(unsigned int port, unsigned int o) { return reinterpret_cast<volatile Reg32 *>(GPIOA_BASE + 0x1000*(port))[o / sizeof(Reg32)]; }
 
 protected:
