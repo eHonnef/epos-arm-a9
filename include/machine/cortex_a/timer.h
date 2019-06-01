@@ -12,8 +12,116 @@
 
 __BEGIN_SYS
 
+
+// Cortex-M SysTick Timer
+class System_Timer_Engine: public Machine_Model
+{
+public:
+    typedef CPU::Reg32 Count;
+    static const TSC::Hertz CLOCK = Traits<CPU>::CLOCK;
+
+protected:
+    System_Timer_Engine() {}
+
+public:
+    static TSC::Hertz clock() { return CLOCK; }
+
+    static void enable() { scs(STCTRL) |= ENABLE; }
+    static void disable() { scs(STCTRL) &= ~ENABLE; }
+
+    static void eoi(const IC::Interrupt_Id & int_id) {}
+
+    static void init(unsigned int f) {
+        scs(STCTRL) = 0;
+        scs(STCURRENT) = 0;
+        scs(STRELOAD) = CLOCK / f;
+        scs(STCTRL) = CLKSRC | INTEN;
+    }
+};
+
+// Cortex-M General Purpose Timer
+class User_Timer_Engine: public Machine_Model
+{
+protected:
+    const static unsigned int CLOCK = Traits<CPU>::CLOCK;
+
+    typedef CPU::Reg32 Count;
+
+protected:
+    User_Timer_Engine(unsigned int channel, const Count & count, bool interrupt = true, bool periodic = true)
+    : _channel(channel), _base(reinterpret_cast<Reg32 *>(TIMER0_BASE + (TIMER1_BASE - TIMER0_BASE) * channel)) {
+        disable();
+        power_user_timer(channel, FULL);
+        reg(GPTMCFG) = 0; // 32-bit timer
+        reg(GPTMTAMR) = periodic ? 2 : 1; // 2 -> Periodic, 1 -> One-shot
+        reg(GPTMTAILR) = count;
+        reg(GPTMTAPR) = (count >> 31) >> 1; // Avoid compiler warning "shift >= width of type"
+        if(interrupt)
+            reg(GPTMIMR) |= TATO_INT;
+        else
+            reg(GPTMIMR) &= ~TATO_INT;
+
+        enable();
+    }
+
+public:
+    ~User_Timer_Engine() { disable(); power_user_timer(_channel, OFF); }
+
+    unsigned int clock() const { return CLOCK; }
+
+    Count read() { return reg(GPTMTAR); } // LM3S811 on QEMU (v2.7.50) does not support reading the value of general purpose timers
+
+    void enable() { reg(GPTMCTL) |= TAEN; }
+    void disable() { reg(GPTMCTL) &= ~TAEN; }
+
+    void pwm(const Percent & duty_cycle) {
+        disable();
+
+        Count count;
+        if(reg(GPTMCFG) == 4) {
+            count = reg(GPTMTAILR) + (reg(GPTMTAPR) << 16);
+        } else {
+            count = reg(GPTMTAILR);
+            reg(GPTMCFG) = 4; // 4 -> 16-bit, only possible value for PWM
+            reg(GPTMTAPR) = count >> 16;
+        }
+
+        reg(GPTMTAMR) = TCMR | TAMS | 2; // 2 -> Periodic, 1 -> One-shot
+        reg(GPTMCTL) &= ~TBPWML; // never inverted
+
+        count = percent2count(duty_cycle, (count & 0x00ffffff));
+        reg(GPTMTAPMR) = count >> 16;
+        reg(GPTMTAMATCHR) = count;
+        enable();
+    }
+
+protected:
+    static void eoi(const IC::Interrupt_Id & int_id) {
+        if(TIMERS >= 1 && int_id == IC::INT_USER_TIMER0)
+            reg(reinterpret_cast<Reg32 *>(TIMER0_BASE), GPTMICR) = -1;
+        else if(TIMERS >= 2 && int_id == IC::INT_USER_TIMER1)
+            reg(reinterpret_cast<Reg32 *>(TIMER1_BASE), GPTMICR) = -1;
+        else if(TIMERS >= 3 && int_id == IC::INT_USER_TIMER2)
+            reg(reinterpret_cast<Reg32 *>(TIMER2_BASE), GPTMICR) = -1;
+        else if(TIMERS >= 4 && int_id == IC::INT_USER_TIMER3)
+            reg(reinterpret_cast<Reg32 *>(TIMER3_BASE), GPTMICR) = -1;
+    }
+
+private:
+    volatile Reg32 & reg(unsigned int o) { return _base[o / sizeof(Reg32)]; }
+    static volatile Reg32 & reg(Reg32 * base, unsigned int o) { return base[o / sizeof(Reg32)]; }
+
+    static Count percent2count(const Percent & duty_cycle, const Count & period) {
+        return period - ((period * duty_cycle) / 100);
+    }
+
+private:
+    unsigned int _channel;
+    Reg32 * _base;
+};
+
 // Tick timer used by the system
-class Timer: private Timer_Common, private Engine
+class Timer: private Timer_Common, private System_Timer_Engine
 {
     friend class Machine;
     friend class Init_System;
@@ -22,6 +130,7 @@ protected:
     static const unsigned int CHANNELS = 2;
     static const unsigned int FREQUENCY = Traits<Timer>::FREQUENCY;
 
+    typedef System_Timer_Engine Engine;
     typedef Engine::Count Count;
     typedef IC::Interrupt_Id Interrupt_Id;
 
@@ -120,7 +229,7 @@ public:
 // User timer
 class User_Timer: private Timer_Common, private User_Timer_Engine
 {
-    friend class PWM;
+    // friend class PWM;
 
 private:
     typedef User_Timer_Engine Engine;

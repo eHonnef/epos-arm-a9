@@ -2,9 +2,9 @@
 *.o
 *.conf
 bin/*
-!bin/.p
+bin/.p
 lib/*
-!lib/.p
+lib/.p
 img/*
 !img/makefile
 **/pc_boot

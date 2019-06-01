@@ -9,13 +9,13 @@
 //============================================================================
 #define MODE library
 #define ARCH armv7
-#define MACH cortex_m
-#define MMOD lm3s811
+#define MACH cortex_a
+#define MMOD realview_pbx
 #define APPL hello
 #define __mode_library__
 #define __arch_armv7__
-#define __mach_cortex_m__
-#define __mmod_lm3s811__
+#define __mach_cortex_a__
+#define __mmod_realview_pbx__
 
 //============================================================================
 // NAMESPACES AND DEFINITIONS
@@ -153,7 +153,7 @@ namespace EPOS {
 
 #define __UART_H                __HEADER_MACH(uart)
 #define __NIC_H                 __HEADER_MACH(nic)
-#define __AES_H                 __HEADER_MACH(aes)
+// #define __AES_H                 __HEADER_MACH(aes)
 #define __ipv4__
 #endif
 

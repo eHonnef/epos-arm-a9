@@ -8,7 +8,12 @@
 #include __MODEL_H
 
 __BEGIN_SYS
-/*
+
+class GIC: public IC_Common, protected Machine_Model
+{
+public:
+    // IRQs
+    static const unsigned int IRQS = Machine_Model::IRQS;
     typedef Interrupt_Id IRQ;
     enum {
         IRQ_GPIOA       = 0,
@@ -48,13 +53,108 @@ __BEGIN_SYS
         TIMER67         = 74,
         IRQ_LAST        = IRQ_UDMAERR
     };
-*/
 
-class IC: private Engine
+    // Interrupts
+    static const unsigned int INTS = 93;
+    static const unsigned int EXC_INT = 0;
+    static const unsigned int HARD_INT = 16;
+    static const unsigned int SOFT_INT = HARD_INT + IRQS;
+    enum {
+        // INT_HARD_FAULT  = ARMv7_A::EXC_UNDEFINED_INSTRUCTION,
+        // INT_TIMER       = ARMv7_A::EXC_IRQ,
+        INT_HARD_FAULT  = ARMv7_M::EXC_HARD,
+        INT_TIMER       = ARMv7_M::EXC_SYSTICK,
+        INT_FIRST_HARD  = HARD_INT,
+        INT_USER_TIMER0 = HARD_INT + IRQ_GPT0A,
+        INT_USER_TIMER1 = HARD_INT + IRQ_GPT1A,
+        INT_USER_TIMER2 = HARD_INT + IRQ_GPT2A,
+        INT_USER_TIMER3 = HARD_INT + IRQ_GPT3A,
+        INT_MACTIMER    = HARD_INT + IRQ_MACTIMER,
+        INT_GPIOA       = HARD_INT + IRQ_GPIOA,
+        INT_GPIOB       = HARD_INT + IRQ_GPIOB,
+        INT_GPIOC       = HARD_INT + IRQ_GPIOC,
+        INT_GPIOD       = HARD_INT + IRQ_GPIOD,
+        INT_NIC0_RX     = HARD_INT + IRQ_RFTXRX,
+        INT_NIC0_TX     = HARD_INT + IRQ_RFTXRX,
+        INT_NIC0_ERR    = HARD_INT + IRQ_RFERR,
+        INT_NIC0_TIMER  = HARD_INT + IRQ_MACTIMER,
+        INT_USB0        = HARD_INT + IRQ_USB,
+        INT_LAST_HARD   = HARD_INT + IRQS,
+        INT_RESCHEDULER = SOFT_INT
+    };
+
+public:
+    GIC() {}
+
+    static int irq2int(int i) { return i + HARD_INT; }
+    static int int2irq(int i) { return i - HARD_INT; }
+
+    static void enable() {
+        db<IC>(TRC) << "IC::enable()" << endl;
+        scs(IRQ_ENABLE0) = ~0;
+        if(IRQS > 32) scs(IRQ_ENABLE1) = ~0;
+        if(IRQS > 64) scs(IRQ_ENABLE2) = ~0;
+    }
+
+    static void enable(const Interrupt_Id & id) {
+        if(id < HARD_INT)
+            return;
+        IRQ i = int2irq(id);
+        db<IC>(TRC) << "IC::enable(irq=" << i << ")" << endl;
+        assert(i < IRQS);
+        if(i < 32) scs(IRQ_ENABLE0) = 1 << i;
+        else if((IRQS > 32) && (i < 64)) scs(IRQ_ENABLE1) = 1 << (i - 32);
+        else if(IRQS > 64) scs(IRQ_ENABLE2) = 1 << (i - 64);
+    }
+
+    static void disable() {
+        db<IC>(TRC) << "IC::disable()" << endl;
+        scs(IRQ_DISABLE0) = ~0;
+        if(IRQS > 32) scs(IRQ_DISABLE1) = ~0;
+        if(IRQS > 64) scs(IRQ_DISABLE2) = ~0;
+    }
+
+    static void disable(const Interrupt_Id & id) {
+        if(id < HARD_INT)
+            return;
+        IRQ i = int2irq(id);
+        db<IC>(TRC) << "IC::disable(irq=" << i << ")" << endl;
+        assert(i < IRQS);
+        if(i < 32) scs(IRQ_DISABLE0) = 1 << i;
+        else if((IRQS > 32) && (i < 64)) scs(IRQ_DISABLE1) = 1 << (i - 32);
+        else if(IRQS > 64) scs(IRQ_DISABLE2) = 1 << (i - 64);
+        unpend(i);
+    }
+
+    // Only works in handler mode (inside IC::entry())
+    static Interrupt_Id int_id() { return CPU::flags() & 0x3f; }
+
+    static void init(void) {};
+
+private:
+    static void unpend() {
+        db<IC>(TRC) << "IC::unpend()" << endl;
+        scs(IRQ_UNPEND0) = ~0;
+        scs(IRQ_UNPEND1) = ~0;
+        scs(IRQ_UNPEND2) = ~0;
+    }
+
+    static void unpend(const IRQ & i) {
+        db<IC>(TRC) << "IC::unpend(irq=" << i << ")" << endl;
+        assert(i < IRQS);
+        if(i < 32) scs(IRQ_UNPEND0) = 1 << i;
+        else if((IRQS > 32) && (i < 64)) scs(IRQ_UNPEND1) = 1 << (i - 32);
+        else if(IRQS > 64) scs(IRQ_UNPEND2) = 1 << (i - 64);
+    }
+};
+
+class IC: private GIC
 {
     friend class Machine;
 
 private:
+
+    typedef GIC Engine;
 
 public:
     using IC_Common::Interrupt_Id;

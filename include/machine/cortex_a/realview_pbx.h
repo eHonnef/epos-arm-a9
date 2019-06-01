@@ -1,7 +1,7 @@
 // EPOS Realview_PBX (ARM Cortex-A9) MCU Mediator Declarations
 
-#ifndef __realview_pbx_h
-#define __realview_pbx_h
+#ifndef __realviewpbx_h
+#define __realviewpbx_h
 
 #include <architecture/cpu.h>
 #include <architecture/tsc.h>
@@ -24,38 +24,36 @@ public:
     static const unsigned int UARTS = 4; // 4
     static const unsigned int GPIO_PORTS = 3; // 3
     static const bool supports_gpio_power_up = false;
-/*
+
     // Base addresses for memory-mapped I/O devices
     enum {
-        WDT0_BASE                   = 0x1000F000, // Watchdog Timer
-        // I2C0_BASE                   = 0x40002000, // I2C
-        GPIOA_BASE                  = 0x10013000, // PrimeCell PL061 GPIO (aka General Purpose Input/Output)
-        GPIOB_BASE                  = 0x10014000, // PrimeCell PL061 GPIO
-        GPIOC_BASE                  = 0x10015000, // PrimeCell PL061 GPIO
-        // GPIOD_BASE                  = 0, // PrimeCell PL061 GPIO
-        USART_BASE                  = 0x1000D000, // PrimeCell PL022 Synchronous Serial Port (ssp)
-        UART0_BASE                  = 0x10009000, // PrimeCell PL011 UART
-        UART1_BASE                  = 0x1000A000, // PrimeCell PL011 UART
-        UART2_BASE                  = 0x1000B000, // PrimeCell PL011 UART
-        UART3_BASE                  = 0x1000C000, // PrimeCell PL011 UART
-        // I2C1_BASE                   = 0, // I2C (nao presente (?))
-        // I2C2_BASE                   = 0, // I2C
-        // GPIOE_BASE                  = 0, // PrimeCell PL061 GPIO
-        TIMER0_BASE                 = 0x10011000, // GPTM (aka general purpose timer module)
-        TIMER1_BASE                 = 0x10012000, // GPTM
-        TIMER2_BASE                 = 0x10018000, // GPTM
-        TIMER3_BASE                 = 0x10019000, //
-        // ADC0_BASE                   = 0, // ADC (nao presente ?)
-        FLASH0_BASE                 = 0x18000300, // Flash Controller (pode ser tambem a 0x1000004C)
-        SCR_BASE0                   = 0x10001000, // System Control (pode ser tambem 0x1001A000)
-        SCR_BASE1                   = 0x1001A000, // System Control (pode ser tambem 0x1001A000)
-        // IC0_BASE                    = 0, // NVIC
-        // TIMER4_BASE                 = 0, // SysTick
-        // IC1_BASE                    = 0, // NVIC
+        WDT0_BASE                   = 0x40000000, // Watchdog Timer
+        I2C0_BASE                   = 0x40002000, // I2C
+        GPIOA_BASE                  = 0x40004000, // PrimeCell PL061 GPIO
+        GPIOB_BASE                  = 0x40005000, // PrimeCell PL061 GPIO
+        GPIOC_BASE                  = 0x40006000, // PrimeCell PL061 GPIO
+        GPIOD_BASE                  = 0x40007000, // PrimeCell PL061 GPIO
+        USART_BASE                  = 0x40008000, // PrimeCell PL022 Synchronous Serial Port
+        UART0_BASE                  = 0x4000c000, // PrimeCell PL011 UART
+        UART1_BASE                  = 0x4000d000, // PrimeCell PL011 UART
+        I2C1_BASE                   = 0x40020000, // I2C
+        I2C2_BASE                   = 0x40021000, // I2C
+        GPIOE_BASE                  = 0x40024000, // PrimeCell PL061 GPIO
+        TIMER0_BASE                 = 0x40030000, // GPTM
+        TIMER1_BASE                 = 0x40031000, // GPTM
+        TIMER2_BASE                 = 0x40032000, // GPTM
+        TIMER3_BASE                 = 0,          // Not present
+        ADC0_BASE                   = 0x40038000, // ADC
+        FLASH0_BASE                 = 0x400fd000, // Flash Controller
+        SCR_BASE                    = 0x400fe000, // System Control
+        IC0_BASE                    = 0xe000e000, // NVIC
+        TIMER4_BASE                 = 0xe000e010, // SysTick
+        IC1_BASE                    = 0xe000e0f0, // NVIC
     };
-*/
+
 // Base addresses for memory-mapped I/O devices
 // https://wiki.osdev.org/User:Pancakes/arm_qemu_realview-pb-a e https://github.com/qemu/qemu/blob/master/hw/arm/realview.c
+/*
     enum {
         SYSREG_BASE                 = 0x10000000, // system registers
         AACI_BASE                   = 0x10004000, // aaci
@@ -80,7 +78,7 @@ public:
         SCR_BASE1                   = 0x1001A000, // System Control (pode ser tambem 0x1001A000)
         PER_BASE                    = 0x1f000000, // peripheal base
     };
-
+*/
     // Offsets para PER_BASE
     enum {
         SCUOFF = 0x0000,	// snoop control unit
@@ -408,9 +406,9 @@ protected:
     Realview_PBX() {}
 
     static void reboot() {
-        Reg32 val = scs(AIRCR) & (~((-1u / VECTKEY) * VECTKEY));
-        val |= 0x05fa * VECTKEY | SYSRESREQ;
-        scs(AIRCR) = val;
+        // Reg32 val = scs(AIRCR) & (~((-1u / VECTKEY) * VECTKEY));
+        // val |= 0x05fa * VECTKEY | SYSRESREQ;
+        // scs(AIRCR) = val;
     }
 
     static void delay(const RTC::Microsecond & time) {
@@ -524,16 +522,19 @@ protected:
 public:
     static volatile Reg32 & scr(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(SCR_BASE)[o / sizeof(Reg32)]; }
     static volatile Reg32 & scs(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(IC0_BASE)[o / sizeof(Reg32)]; }
+    // static volatile Reg32 & scr(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(SCR_BASE0)[o / sizeof(Reg32)]; }
+    // static volatile Reg32 & scs(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(PER_BASE + GICOFF)[o / sizeof(Reg32)]; }
 
-    static volatile Reg32 & systick(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(PER_BASE + GTIOFF)[o / sizeof(Reg32)]; }
+    static volatile Reg32 & systick(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(TIMER4_BASE)[o / sizeof(Reg32)]; }
+    // static volatile Reg32 & systick(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(PER_BASE + GTIOFF)[o / sizeof(Reg32)]; }
     static volatile Reg32 & tsc(unsigned int o)     { return reinterpret_cast<volatile Reg32 *>(TIMER1_BASE)[o / sizeof(Reg32)]; }
     static volatile Reg32 & timer0(unsigned int o)  { return reinterpret_cast<volatile Reg32 *>(TIMER0_BASE)[o / sizeof(Reg32)]; }
     static volatile Reg32 & timer1(unsigned int o)  { return reinterpret_cast<volatile Reg32 *>(TIMER2_BASE)[o / sizeof(Reg32)]; }
     static volatile Reg32 & gpioa(unsigned int o)   { return reinterpret_cast<volatile Reg32 *>(GPIOA_BASE)[o / sizeof(Reg32)]; }
     static volatile Reg32 & gpiob(unsigned int o)   { return reinterpret_cast<volatile Reg32 *>(GPIOB_BASE)[o / sizeof(Reg32)]; }
     static volatile Reg32 & gpioc(unsigned int o)   { return reinterpret_cast<volatile Reg32 *>(GPIOC_BASE)[o / sizeof(Reg32)]; }
-    // static volatile Reg32 & gpiod(unsigned int o)   { return reinterpret_cast<volatile Reg32 *>(GPIOD_BASE)[o / sizeof(Reg32)]; }
-    // static volatile Reg32 & gpioe(unsigned int o)   { return reinterpret_cast<volatile Reg32 *>(GPIOE_BASE)[o / sizeof(Reg32)]; }
+    static volatile Reg32 & gpiod(unsigned int o)   { return reinterpret_cast<volatile Reg32 *>(GPIOD_BASE)[o / sizeof(Reg32)]; }
+    static volatile Reg32 & gpioe(unsigned int o)   { return reinterpret_cast<volatile Reg32 *>(GPIOE_BASE)[o / sizeof(Reg32)]; }
     static volatile Reg32 & gpio(unsigned int port, unsigned int o) { return reinterpret_cast<volatile Reg32 *>(GPIOA_BASE + 0x1000*(port))[o / sizeof(Reg32)]; }
 
 protected:
