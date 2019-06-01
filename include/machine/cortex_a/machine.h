@@ -20,14 +20,14 @@ class Machine: private Machine_Common, private Machine_Model
 public:
     Machine() {}
 
-    static void delay(const RTC::Microsecond & time);
+    static void delay(const RTC::Microsecond & time) { Machine_Model::delay(time); }// @TODO: so coloquei o retorno pra funcionar
     
     static void panic();
     static void reboot();
-    static void poweroff();
+    static void poweroff() { reboot(); }// @TODO: so coloquei o retorno pra funcionar
 
-    static unsigned int n_cpus();
-    static unsigned int cpu_id();
+    static unsigned int n_cpus() { return 1; } // @TODO: so coloquei o retorno pra funcionar
+    static unsigned int cpu_id() {return 0;} // @TODO: so coloquei o retorno pra funcionar
 
     static void smp_barrier();
     static void smp_init(unsigned int);
