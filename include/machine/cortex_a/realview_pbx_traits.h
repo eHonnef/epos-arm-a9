@@ -17,7 +17,7 @@ template<> struct Traits<Machine>: public Traits<Machine_Common>
 {
     static const unsigned int CPUS = Traits<Build>::CPUS;
 /*
-    // Physical Memory
+    // Physical Memory 
     static const unsigned int MEM_BASE    = 0x48000000;
     static const unsigned int MEM_TOP     = 0x481ffffe; // 2 MB (1FFFFE)
     static const unsigned int BOOT_STACK  = 0x481ffffb; // MEM_TOP - sizeof(int) (?????????)
