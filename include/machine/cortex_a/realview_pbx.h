@@ -395,9 +395,9 @@ protected:
     Realview_PBX() {}
 
     static void reboot() {
-        // Reg32 val = scs(AIRCR) & (~((-1u / VECTKEY) * VECTKEY));
-        // val |= 0x05fa * VECTKEY | SYSRESREQ;
-        // scs(AIRCR) = val;
+        Reg32 val = scs(AIRCR) & (~((-1u / VECTKEY) * VECTKEY));
+        val |= 0x05fa * VECTKEY | SYSRESREQ;
+        scs(AIRCR) = val;
     }
 
     static void delay(const RTC::Microsecond & time) {
