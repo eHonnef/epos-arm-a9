@@ -18,29 +18,29 @@ template<> struct Traits<Machine>: public Traits<Machine_Common>
     static const unsigned int CPUS = Traits<Build>::CPUS;
 
     // Physical Memory 
-    static const unsigned int MEM_BASE  = 0x10060000;
-    static const unsigned int MEM_TOP   = 0x1007FFF8;
-    static const unsigned int BOOT_STACK  = 0x1007FFF; // MEM_TOP - sizeof(int)
+    static const unsigned int MEM_BASE    = 0x00000000;
+    static const unsigned int MEM_TOP     = 0x0FFFFFFF;
+    static const unsigned int BOOT_STACK  = 0x0FFFFFF0; // MEM_TOP - sizeof(int)
 
     // Logical Memory Map
-    static const unsigned int APP_LOW   = 0x10060000;
-    static const unsigned int APP_CODE  = 0x10000;
-    static const unsigned int APP_DATA  = 0x10060000;
-    static const unsigned int APP_HIGH  = 0x1007FFF8;
+    static const unsigned int APP_LOW   = 0x00000000;
+    static const unsigned int APP_CODE  = 0x00000000;
+    static const unsigned int APP_DATA  = 0x03100000;
+    static const unsigned int APP_HIGH  = 0x06100000;
 
     // TODO: Use real values
-    static const unsigned int PHY_MEM   = 0x10060000;
-    static const unsigned int IO_BASE   = 0x10000000;
-    static const unsigned int IO_TOP    = 0x1001FFFC;
+    static const unsigned int PHY_MEM   = 0x00000000;
+    static const unsigned int IO_BASE   = 0x00000000;
+    static const unsigned int IO_TOP    = 0x00000000;
 
-    static const unsigned int SYS       = 0x00200000;
-    static const unsigned int SYS_CODE  = 0x00200000;
-    static const unsigned int SYS_DATA  = 0x10060000;
+    static const unsigned int SYS       = 0x06100000;
+    static const unsigned int SYS_CODE  = 0x06100000;
+    static const unsigned int SYS_DATA  = 0x07100000;
 
     // Default Sizes and Quantities
-    static const unsigned int STACK_SIZE = 512;
-    static const unsigned int HEAP_SIZE = 512;
-    static const unsigned int MAX_THREADS = 5;
+    static const unsigned int STACK_SIZE = 16 * 1024;
+    static const unsigned int HEAP_SIZE = 16 * 1024 * 1024;
+    static const unsigned int MAX_THREADS = 16;
 };
 
 template<> struct Traits<IC>: public Traits<Machine_Common>

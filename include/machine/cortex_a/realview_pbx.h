@@ -46,14 +46,14 @@ public:
         TIMER1_BASE                 = 0x10011020, // GPTM
         TIMER2_BASE                 = 0x10012000, // GPTM
         TIMER3_BASE                 = 0x10012020, // GPTM
-        PRIV_TIMER_BASE             = 0x1f000600,
-        GLOBAL_TIMER_BASE           = 0x1f000200,
-        DIST_BASE                   = 0x1f001000,
-        CPU_ITF_BASE                = 0x1f000100,
+        PER_BASE                    = 0x1F000000, // peripheal base
+        PRIV_TIMER_BASE             = 0x1F000600, // cpu private timer
+        GLOBAL_TIMER_BASE           = 0x1F000200, // global timer
+        DIST_BASE                   = 0x1f001000, // gic distributor
+        CPU_ITF_BASE                = 0x1f000100, // private gic
         RTC_BASE                    = 0x10017000, // rtc
         FLASH0_BASE                 = 0x18000300, // Flash Controller (pode ser tambem a 0x1000004C)
         FLASHCFG_BASE               = 0x4c000000, // Flash CONFIGURATION
-        PER_BASE                    = 0x1f000000, // peripheal base
         GIC1_BASE                   = 0x1e000000,
         GIC2_BASE                   = 0x1e001000,
         GIC3_BASE                   = 0x1e002000,
@@ -169,7 +169,7 @@ public:
         ACK_CTL                     = 1 << 2    // Acknowledge control          r/w     0
     };
 
-    // Global Timer Registers offsets
+    // Global Timer Registers offsets (ok, checado)
     enum {                                      // Description
         GTCTRL                      = 0x00,     // Low Counter
         GTCTRH                      = 0x04,     // High Counter
@@ -177,7 +177,7 @@ public:
         GTISR                       = 0x0C      // Interrupt Status
     };
 
-    // Private Timer Registers offsets
+    // Private Timer Registers offsets (ok, checado)
     enum {                                      // Description
         PTLR                        = 0x00,     // Load
         PTCTR                       = 0x04,     // Counter
@@ -243,7 +243,7 @@ protected:
 
     }
 
-// PM
+    // PM
     static void power_uart(unsigned int unit, const Power_Mode & mode) {
         assert(unit < UARTS);
         switch(mode) {
@@ -263,7 +263,6 @@ protected:
         }
     }
 
-    // Zynq's Global Timer clock cannot be powered off
     static void power_user_timer(unsigned int unit, const Power_Mode & mode) {
         assert(unit < UARTS);
         switch(mode) {
