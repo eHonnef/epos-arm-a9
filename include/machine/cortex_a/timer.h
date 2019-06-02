@@ -13,12 +13,12 @@
 __BEGIN_SYS
 
 
-// Cortex-M SysTick Timer
+// Cortex-A Private Timer
 class System_Timer_Engine: public Machine_Model
 {
 public:
     typedef CPU::Reg32 Count;
-    static const TSC::Hertz CLOCK = Traits<CPU>::CLOCK;
+    static const unsigned int CLOCK = Traits<CPU>::CLOCK/2;
 
 protected:
     System_Timer_Engine() {}
@@ -26,98 +26,63 @@ protected:
 public:
     static TSC::Hertz clock() { return CLOCK; }
 
-    static void enable() { scs(STCTRL) |= ENABLE; }
-    static void disable() { scs(STCTRL) &= ~ENABLE; }
+    static void enable() { priv_timer(PTCLR) |= TIMER_ENABLE; }
+    static void disable() { priv_timer(PTCLR) &= ~TIMER_ENABLE; }
 
-    static void eoi(const IC::Interrupt_Id & int_id) {}
+    static void eoi(const IC::Interrupt_Id & int_id) { priv_timer(PTISR) = INT_CLR; }
+
+    void power(const Power_Mode & mode);
 
     static void init(unsigned int f) {
-        scs(STCTRL) = 0;
-        scs(STCURRENT) = 0;
-        scs(STRELOAD) = CLOCK / f;
-        scs(STCTRL) = CLKSRC | INTEN;
+        priv_timer(PTCLR) = 0;
+        priv_timer(PTISR) = INT_CLR;
+        priv_timer(PTLR) = CLOCK / f;
+        priv_timer(PTCLR) = IRQ_EN | AUTO_RELOAD;
     }
 };
 
-// Cortex-M General Purpose Timer
+// Cortex-A Global Timer
 class User_Timer_Engine: public Machine_Model
 {
 protected:
-    const static unsigned int CLOCK = Traits<CPU>::CLOCK;
-
-    typedef CPU::Reg32 Count;
-
-protected:
-    User_Timer_Engine(unsigned int channel, const Count & count, bool interrupt = true, bool periodic = true)
-    : _channel(channel), _base(reinterpret_cast<Reg32 *>(TIMER0_BASE + (TIMER1_BASE - TIMER0_BASE) * channel)) {
-        disable();
-        power_user_timer(channel, FULL);
-        reg(GPTMCFG) = 0; // 32-bit timer
-        reg(GPTMTAMR) = periodic ? 2 : 1; // 2 -> Periodic, 1 -> One-shot
-        reg(GPTMTAILR) = count;
-        reg(GPTMTAPR) = (count >> 31) >> 1; // Avoid compiler warning "shift >= width of type"
-        if(interrupt)
-            reg(GPTMIMR) |= TATO_INT;
-        else
-            reg(GPTMIMR) &= ~TATO_INT;
-
-        enable();
-    }
+    typedef CPU::Reg64 Count;
+    typedef TSC::Hertz Hertz;
 
 public:
-    ~User_Timer_Engine() { disable(); power_user_timer(_channel, OFF); }
+    static const Hertz CLOCK = Traits<CPU>::CLOCK / 2;
 
-    unsigned int clock() const { return CLOCK; }
+public:
+    User_Timer_Engine(unsigned int channel, const Count & count, bool interrupt = true, bool periodic = true);
 
-    Count read() { return reg(GPTMTAR); } // LM3S811 on QEMU (v2.7.50) does not support reading the value of general purpose timers
+    static Hertz clock() { return CLOCK; }
 
-    void enable() { reg(GPTMCTL) |= TAEN; }
-    void disable() { reg(GPTMCTL) &= ~TAEN; }
+    Count read() {
+        Reg32 high, low;
 
-    void pwm(const Percent & duty_cycle) {
-        disable();
+        do {
+            high = global_timer(GTCTRH);
+            low = global_timer(GTCTRL);
+        } while(global_timer(GTCTRH) != high);
 
-        Count count;
-        if(reg(GPTMCFG) == 4) {
-            count = reg(GPTMTAILR) + (reg(GPTMTAPR) << 16);
-        } else {
-            count = reg(GPTMTAILR);
-            reg(GPTMCFG) = 4; // 4 -> 16-bit, only possible value for PWM
-            reg(GPTMTAPR) = count >> 16;
-        }
+        return static_cast<Count>(high) << 32 | low;
+    }
 
-        reg(GPTMTAMR) = TCMR | TAMS | 2; // 2 -> Periodic, 1 -> One-shot
-        reg(GPTMCTL) &= ~TBPWML; // never inverted
+    static void enable();
+    static void disable();
 
-        count = percent2count(duty_cycle, (count & 0x00ffffff));
-        reg(GPTMTAPMR) = count >> 16;
-        reg(GPTMTAMATCHR) = count;
-        enable();
+    void set(const Count & count) {
+        // Disable counting before programming
+        global_timer(GTCLR) = 0;
+
+        global_timer(GTCTRL) = count & 0xffffffff;
+        global_timer(GTCTRH) = count >> 32;
+
+        // Re-enable counting
+        global_timer(GTCLR) = 1;
     }
 
 protected:
-    static void eoi(const IC::Interrupt_Id & int_id) {
-        if(TIMERS >= 1 && int_id == IC::INT_USER_TIMER0)
-            reg(reinterpret_cast<Reg32 *>(TIMER0_BASE), GPTMICR) = -1;
-        else if(TIMERS >= 2 && int_id == IC::INT_USER_TIMER1)
-            reg(reinterpret_cast<Reg32 *>(TIMER1_BASE), GPTMICR) = -1;
-        else if(TIMERS >= 3 && int_id == IC::INT_USER_TIMER2)
-            reg(reinterpret_cast<Reg32 *>(TIMER2_BASE), GPTMICR) = -1;
-        else if(TIMERS >= 4 && int_id == IC::INT_USER_TIMER3)
-            reg(reinterpret_cast<Reg32 *>(TIMER3_BASE), GPTMICR) = -1;
-    }
-
-private:
-    volatile Reg32 & reg(unsigned int o) { return _base[o / sizeof(Reg32)]; }
-    static volatile Reg32 & reg(Reg32 * base, unsigned int o) { return base[o / sizeof(Reg32)]; }
-
-    static Count percent2count(const Percent & duty_cycle, const Count & period) {
-        return period - ((period * duty_cycle) / 100);
-    }
-
-private:
-    unsigned int _channel;
-    Reg32 * _base;
+    static void eoi(const IC::Interrupt_Id & int_id) {}
 };
 
 // Tick timer used by the system
