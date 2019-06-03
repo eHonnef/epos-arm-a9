@@ -28,7 +28,6 @@ template<> struct Traits<Machine>: public Traits<Machine_Common>
     static const unsigned int APP_DATA  = 0x03100000;
     static const unsigned int APP_HIGH  = 0x06100000;
 
-    // TODO: Use real values
     static const unsigned int PHY_MEM   = 0x00000000;
     static const unsigned int IO_BASE   = 0x00000000;
     static const unsigned int IO_TOP    = 0x00000000;

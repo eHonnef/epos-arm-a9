@@ -8,14 +8,9 @@ void _vector_table() __attribute__((used, naked, section(".init")));
 
 // Interrupt Vector Table
 void _vector_table() {
+    
     ASM(
-        // EPOS Cortex-A SETUP
-        //.file cortex_a_setup.S
         // Interrupt Vector Table
-        ".section .init                                  \n"
-        ".type _vector_table, object                     \n"
-
-        "_vector_table:                                  \n"
         "ldr pc, _start_addr                             \n"
         "ldr pc, _undefined_instruction_addr             \n"
         "ldr pc, _swi_addr                               \n"
@@ -39,6 +34,6 @@ void _vector_table() {
         "_irq_addr:                                      \n"
         ".word _int_entry                                \n"
         "_fiq_addr:                                      \n"
-        ".word _fiq                              \n" : : 
-        );
+        ".word _fiq                                      \n" 
+    );
 }

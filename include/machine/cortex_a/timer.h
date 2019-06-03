@@ -82,7 +82,7 @@ public:
     }
 
 protected:
-    static void eoi(const IC::Interrupt_Id & int_id) {}
+    static void eoi(const IC::Interrupt_Id & int_id) { global_timer(GTISR) = INT_CLR; }
 };
 
 // Tick timer used by the system

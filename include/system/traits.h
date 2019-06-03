@@ -133,7 +133,7 @@ template<> struct Traits<System>: public Traits<void>
 {
     static const unsigned int mode = Traits<Build>::MODE;
     static const bool multithread = (Traits<Application>::MAX_THREADS > 1);
-    static const bool multiheap = false;
+    static const bool multiheap = (Traits<Build>::MODEL != LM3S811);
 
     static const bool multicore = (Traits<Build>::CPUS > 1);
 

@@ -45,20 +45,32 @@ int cpu_bound() {
 int main() {
   thread_io = new Thread(&io_bound);
   thread_cpu = new Thread(&cpu_bound);
+
+  volatile int cpu = thread_cpu->priority();
+  volatile int io = thread_io->priority();
+  
   cout << "IO Bound Thread BEFORE execution has priority "
-       << thread_io->priority() << endl;
+       << io << endl;
   cout << "CPU Bound Thread BEFORE execution has priority "
-       << thread_cpu->priority() << endl;
+       << cpu << endl;
+  
+  
   cout << "\nExecuting..." << endl;
   thread_io->join();
   cout << "IO Bound Thread finished executing." << endl;
   int result = thread_cpu->join();
   cout << "CPU Bound Thread finished executing." << endl;
   cout << "Both threads have finished.\n" << endl;
+
+  io = thread_io->priority();
+  cpu = thread_cpu->priority();
+
   cout << "AFTER execution, IO Bound Thread has priority "
-       << thread_io->priority() << endl;
+       << io << endl;
   cout << "AFTER exectuion, CPU Bound Thread has priority "
-       << thread_cpu->priority() << endl;
+       << cpu << endl;
+
+  
   delete thread_io;
   delete thread_cpu;
   return 0;

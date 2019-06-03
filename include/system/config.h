@@ -11,7 +11,7 @@
 #define ARCH armv7
 #define MACH cortex_a
 #define MMOD realview_pbx
-#define APPL hello
+#define APPL fb_sched_test
 #define __mode_library__
 #define __arch_armv7__
 #define __mach_cortex_a__
@@ -149,12 +149,12 @@ namespace EPOS {
 
 #ifdef __mmod_realview_pbx__
 #define __TSC_H                 __HEADER_ARCH(tsc)
-#define __PMU_H                 __HEADER_ARCH(pmu)
+// #define __PMU_H                 __HEADER_ARCH(pmu)
 
 #define __UART_H                __HEADER_MACH(uart)
-#define __NIC_H                 __HEADER_MACH(nic)
+// #define __NIC_H                 __HEADER_MACH(nic)
 // #define __AES_H                 __HEADER_MACH(aes)
-#define __ipv4__
+// #define __ipv4__
 #endif
 
 //============================================================================

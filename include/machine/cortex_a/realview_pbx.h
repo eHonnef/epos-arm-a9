@@ -32,7 +32,6 @@ public:
         // SYSLOCK_BASE                = 0x10000020, // System lock (0xA05F to unlock)
         SCR_BASE                    = 0x10001000, // System Control (pode ser tambem 0x1001A000 ?)
         AACI_BASE                   = 0x10004000, // aaci
-        MCI_BASE                    = 0x10004000, // mci
         WDT0_BASE                   = 0x10010000, // Watchdog Timer
         GPIOA_BASE                  = 0x10013000, // PrimeCell PL061 GPIO (aka General Purpose Input/Output)
         GPIOB_BASE                  = 0x10014000, // PrimeCell PL061 GPIO
@@ -257,6 +256,13 @@ protected:
         }
     }
 
+    static unsigned int cpu_get_periphbase() {
+        int result;
+        asm ("mrc p15, #4, %0, c15, c0, #0" : "=r" (result));
+        return result;
+    }
+
+
     static void power_user_timer(unsigned int unit, const Power_Mode & mode) {
         assert(unit < UARTS);
         switch(mode) {
@@ -273,12 +279,13 @@ protected:
     static void unlock_slcr() { slcr(SLCR_UNLOCK) = UNLOCK_KEY; }
     static void lock_slcr() { slcr(SLCR_LOCK) = LOCK_KEY; }
 
-    static void enable_uart(unsigned int unit) {}
+    static void enable_uart(unsigned int unit) {
+        uart0(0x38) |= (1<<4); // enable UART RXIM interrupt
+    }
 
     // timers estao inicializados
     static void init_machine() {
         init_scu();
-        _init_uart();
         init_mmu();
         init_gic();
     }
@@ -298,16 +305,14 @@ protected:
     }
     static void init_gic() {}
 
-    static void _init_uart() {
-        uart0(0x38) |= (1<<4); // enable UART RXIM interrupt
-    }
-
     static void init_mmu() {}
 
 public:
     static volatile Reg32 & slcr(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(SYSREG_BASE)[o / sizeof(Reg32)]; }
     static volatile Reg32 & cpu_itf(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(CPU_ITF_BASE)[o / sizeof(Reg32)]; }
     static volatile Reg32 & global_timer(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(GLOBAL_TIMER_BASE)[o / sizeof(Reg32)]; }
+    // static volatile Reg32 & global_timer(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(cpu_get_periphbase() + GTIOFF)[o / sizeof(Reg32)]; }
+    // static volatile Reg32 & priv_timer(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(cpu_get_periphbase() + PTIOFF)[o / sizeof(Log_Addr)]; }
     static volatile Reg32 & priv_timer(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(PRIV_TIMER_BASE)[o / sizeof(Log_Addr)]; }
     static volatile Reg32 & dist(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(DIST_BASE)[o / sizeof(Reg32)]; }
     static volatile Reg32 & uart0(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(UART0_BASE)[o / sizeof(Reg32)]; }
