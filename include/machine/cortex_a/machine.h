@@ -24,10 +24,10 @@ public:
     
     static void panic();
     static void reboot();
-    static void poweroff() { reboot(); }// @TODO: so coloquei o retorno pra funcionar
+    static void poweroff() { reboot(); }
 
-    static unsigned int n_cpus() { return 1; } // @TODO: so coloquei o retorno pra funcionar
-    static unsigned int cpu_id() {return 0;} // @TODO: so coloquei o retorno pra funcionar
+    static unsigned int n_cpus() { return Traits<Build>::CPUS; }
+    static unsigned int cpu_id() { return Machine_Model::cpu_id(); }
 
     static void smp_barrier();
     static void smp_init(unsigned int);

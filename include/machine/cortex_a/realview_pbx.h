@@ -29,8 +29,8 @@ public:
 // https://wiki.osdev.org/User:Pancakes/arm_qemu_realview-pb-a e https://github.com/qemu/qemu/blob/master/hw/arm/realview.c
     enum {
         SYSREG_BASE                 = 0x10000000, // system registers
-        SCR_BASE                    = 0x10001000, // System Control (pode ser tambem 0x1001A000)
-        // SCR_BASE1                   = 0x1001A000, // System Control (pode ser tambem 0x1001A000)
+        // SYSLOCK_BASE                = 0x10000020, // System lock (0xA05F to unlock)
+        SCR_BASE                    = 0x10001000, // System Control (pode ser tambem 0x1001A000 ?)
         AACI_BASE                   = 0x10004000, // aaci
         MCI_BASE                    = 0x10004000, // mci
         WDT0_BASE                   = 0x10010000, // Watchdog Timer
@@ -130,8 +130,8 @@ public:
 
     // SLCR Registers offsets
     enum {                                      // Description
-        SLCR_LOCK                   = 0x004,    // Lock the SLCR
-        SLCR_UNLOCK                 = 0x008,    // Unlock the SLCR
+        SLCR_LOCK                   = 0x020,    // Lock the SLCR
+        SLCR_UNLOCK                 = 0x020,    // Unlock the SLCR
         UART_CLK_CTRL               = 0x154,    // UART Ref Clock Control
         FPGA0_CLK_CTRL              = 0x170,    // PL Clock 0 Output control
         PSS_RST_CTRL                = 0x200,    // PS Software Reset Control
@@ -145,7 +145,7 @@ public:
 
     // Useful bits in SLCR_UNLOCK
     enum {                                      // Description                  Type    Value after reset
-        UNLOCK_KEY                  = 0xDF0D    // Unlock key                   wo      0
+        UNLOCK_KEY                  = 0xA05F    // Unlock key                   wo      0
     };
 
     // Useful bits in FPGAN_CLK_CTRL
@@ -217,10 +217,8 @@ protected:
     Realview_PBX() {}
 
     static void reboot() {
-        // This will mess with qemu but works on real hardware, possibly a bug
-        // in qemu. Note that the asserting reset will clear the RAM where the
-        // application is stored.
-        slcr(PSS_RST_CTRL) = 1;
+        // ¯\_(ツ)_/¯
+        //slcr(PSS_RST_CTRL) = 1;
     }
 
     static void delay(const RTC::Microsecond & time) {
@@ -229,7 +227,7 @@ protected:
         while(end > TSC::time_stamp());
     }
 
-    static const UUID & uuid() { return System::info()->bm.uuid; } // TODO: System_Info is not populated in this machine
+    static const UUID & uuid() { return System::info()->bm.uuid; }
 
     static unsigned int cpu_id() {
         int id;
@@ -237,10 +235,6 @@ protected:
             : "=r"(id)
             : : );
         return id & 0x3;
-    }
-
-    static void enable_uart(unsigned int unit) {
-
     }
 
     // PM
@@ -276,50 +270,39 @@ protected:
         }
     }
 
-    // Returns the frequency set, -1 if frequency can't be set
-    static int fpga0_clk_freq(unsigned int freq) {
-        const unsigned int div_max = 63, tol = 20;
-        unsigned int div0 = 0, div1 = 0,
-                // io_pll_clock = Traits<Machine>::IO_PLL_CLOCK;
-                io_pll_clock = 1000000; // 1mhz
-        Reg32 tmp;
-
-        while(++div1 <= div_max) {
-            div0 = 1;
-            while(++div0 <= div_max)
-                if((io_pll_clock/(div0*div1) < (freq + freq/tol)) &&
-                        (io_pll_clock/(div0*div1) > (freq - freq/tol)))
-                    goto set_clk_ctrl;
-        }
-
-        return -1;
-
-        set_clk_ctrl:
-        tmp = slcr(FPGA0_CLK_CTRL);
-        tmp &= ~((DIVISOR0 * 0x3f) | (DIVISOR1 * 0x3f));
-        slcr(FPGA0_CLK_CTRL) = tmp | (DIVISOR0 * div0) | (DIVISOR1 * div1);
-
-        return io_pll_clock/(div0*div1);
-    }
-
-    // PL logic connecting to the PS must not be reset when active transactions
-    // exist, since uncompleted transactions could be left pending in the PS
-    static void fpga_reset(int n) {
-        assert(n < 4);
-        slcr(FPGA_RST_CTRL) |= 1 << n;
-        // FPGA peripherals will reset on the rising/falling edge of their
-        // clocks if reset is asserted. This "rough" 1 us delay will ensure all
-        // peripherals operating on clocks higher than 1 MHz will be correctly
-        // reseted.
-        for(unsigned int i = 0; i < Traits<CPU>::CLOCK/1000000; i++)
-            ASM("nop");
-        slcr(FPGA_RST_CTRL) &= ~(1 << n);
-    }
-
-    static void fpga_reset() { for(int i = 0; i < 4; i++) fpga_reset(i); }
-
     static void unlock_slcr() { slcr(SLCR_UNLOCK) = UNLOCK_KEY; }
     static void lock_slcr() { slcr(SLCR_LOCK) = LOCK_KEY; }
+
+    static void enable_uart(unsigned int unit) {}
+
+    // timers estao inicializados
+    static void init_machine() {
+        init_scu();
+        _init_uart();
+        init_mmu();
+        init_gic();
+    }
+    static void init_scu() {
+        ASM(
+            // Read peripheral base address
+            "MRC p15, 4, r0, c15, c0, 0       \n"
+            // read SCU Control Register
+            "LDR r1, [r0]                     \n"
+            // set bit0 (Enable bit) to 1 
+            "ORR r1, r1, #0x1                 \n"
+            // write back modified value
+            "STR r1, [r0]                     \n"
+            "BX lr \n"
+            : :
+        );
+    }
+    static void init_gic() {}
+
+    static void _init_uart() {
+        uart0(0x38) |= (1<<4); // enable UART RXIM interrupt
+    }
+
+    static void init_mmu() {}
 
 public:
     static volatile Reg32 & slcr(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(SYSREG_BASE)[o / sizeof(Reg32)]; }
@@ -327,6 +310,7 @@ public:
     static volatile Reg32 & global_timer(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(GLOBAL_TIMER_BASE)[o / sizeof(Reg32)]; }
     static volatile Reg32 & priv_timer(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(PRIV_TIMER_BASE)[o / sizeof(Log_Addr)]; }
     static volatile Reg32 & dist(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(DIST_BASE)[o / sizeof(Reg32)]; }
+    static volatile Reg32 & uart0(unsigned int o) { return reinterpret_cast<volatile Reg32 *>(UART0_BASE)[o / sizeof(Reg32)]; }
 
 // protected:
     static void pre_init();
