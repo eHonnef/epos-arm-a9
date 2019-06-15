@@ -17,15 +17,15 @@ public:
     Init_System() {
         db<Init>(TRC) << "Init_System()" << endl;
 
-        // Machine::smp_barrier();
+        Machine::smp_barrier();
 
         // Only the boot CPU runs INIT_SYSTEM fully
         if(Machine::cpu_id() != 0) {
             // Wait until the boot CPU has initialized the machine
             Machine::smp_barrier();
             // For IA-32, timer is CPU-local. What about other SMPs?
-            // CPU::init();
-            // Timer::init();
+            CPU::init();
+            Timer::init();
             Thread::init();
             return;
         }
@@ -50,10 +50,13 @@ public:
         Machine::init();
         db<Init>(INF) << "done!" << endl;
 
+        Machine::smp_barrier();
+        
         // Initialize system abstractions
         db<Init>(INF) << "Initializing system abstractions: " << endl;
         System::init();
         db<Init>(INF) << "done!" << endl;
+
 
         // Randomize the Random Numbers Generator's seed
         if(Traits<Random>::enabled) {

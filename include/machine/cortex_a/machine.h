@@ -34,9 +34,7 @@ public:
     }
 
     static void smp_barrier() {
-        db<Init>(INF) << "SMP barrier" << endl;
-        
-        static volatile unsigned int ready[2];
+        static volatile unsigned int ready[Traits<Build>::CPUS];
         static volatile unsigned int i;
 
         if(smp) {
