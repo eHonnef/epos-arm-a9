@@ -33,13 +33,33 @@ public:
         return id & 0x3;
     }
 
-    static void smp_barrier() {}
+    static void smp_barrier() {
+        db<Init>(INF) << "SMP barrier" << endl;
+        
+        static volatile unsigned int ready[2];
+        static volatile unsigned int i;
+
+        if(smp) {
+            int j = i;
+
+            CPU::finc(ready[j]);
+
+            if(cpu_id() == 0) {
+        	    while(ready[j] < n_cpus());     // wait for all CPUs to be ready
+                i = !i;                         // toggle ready
+                ready[j] = 0;                   // signalizes waiting CPUs
+            } else
+        	    while(ready[j]);            // wait for CPU[0] signal
+        }
+    }
 
     static void smp_init(unsigned int n_cpus) {}
 
     static const UUID & uuid() { return Machine_Model::uuid(); }
 
 private:
+    static const bool smp = Traits<System>::multicore;
+    
     static void pre_init(System_Info * si);
     static void init();
 };
