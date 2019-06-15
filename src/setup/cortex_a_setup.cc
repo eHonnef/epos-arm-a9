@@ -55,6 +55,12 @@ void _vector_table()
         ORR r0, r0, #1 << 11        // Program flow prediction                                        \t\n\
         MCR p15, 0, r0, c1, c0, 0   // System control register                                        \t\n\
         //-----------------------------------------------                                             \t\n\
+        // Setup Stacks                                                                                         \t\n\
+        MSR     CPSR_c, #0xD2                                                                                   \t\n\
+        LDR     sp, =0x001fe000                                                                                 \t\n\
+                                                                                                                \t\n\
+        MSR     CPSR_c, #0xDF       // No interrupts                                                            \t\n\
+        LDR     sp, =0x001fc000                                                                                 \t\n\
                                                                                                                 \t\n\
         //MMU init                                                                                              \t\n\
         //Invalidate caches                                                                                     \t\n\

@@ -11,7 +11,7 @@
 #define ARCH armv7
 #define MACH cortex_a
 #define MMOD realview_pbx
-#define APPL hello
+#define APPL philosophers_dinner
 #define __mode_library__
 #define __arch_armv7__
 #define __mach_cortex_a__
