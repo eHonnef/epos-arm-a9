@@ -49,7 +49,7 @@ template<> struct Traits<Build>: public Traits<void>
     static const unsigned int ARCHITECTURE = ARMv7;
     static const unsigned int MACHINE = Cortex_A;
     static const unsigned int MODEL = Realview_PBX;
-    static const unsigned int CPUS = 1;
+    static const unsigned int CPUS = 4;
     static const unsigned int NODES = 1; // > 1 => NETWORKING
 };
 
@@ -133,8 +133,7 @@ template<> struct Traits<System>: public Traits<void>
 {
     static const unsigned int mode = Traits<Build>::MODE;
     static const bool multithread = (Traits<Application>::MAX_THREADS > 1);
-    static const bool multiheap = (Traits<Build>::MODEL != LM3S811);
-
+    static const bool multiheap = false;
     static const bool multicore = (Traits<Build>::CPUS > 1);
 
     static const unsigned long LIFE_SPAN = 1 * YEAR; // s
@@ -147,7 +146,7 @@ template<> struct Traits<System>: public Traits<void>
 
 template<> struct Traits<Thread>: public Traits<void>
 {
-    typedef Scheduling_Criteria::FB Criterion;
+    typedef Scheduling_Criteria::CPU_Affinity Criterion;
     static const unsigned int QUANTUM = 10000; // us
     static const bool trace_idle = hysterically_debugged;
 };

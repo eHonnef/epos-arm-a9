@@ -32,96 +32,62 @@ public:
         IRQ_SOFTWARE13          = 13,
         IRQ_SOFTWARE14          = 14,
         IRQ_SOFTWARE15          = 15,
-        IRQ_GLOBAL_TIMER        = 27,
-        IRQ_NFIQ                = 28,
-        IRQ_PRIVATE_TIMER       = 29,
-        IRQ_AWDT                = 30,
-        IRQ_NIRQ                = 31,
-        IRQ_APU0                = 32,
-        IRQ_APU1                = 33,
-        IRQ_L2                  = 34,
-        IRQ_OCM                 = 35,
-        IRQ_PMU0                = 37,
-        IRQ_PMU1                = 38,
-        IRQ_XADC                = 39,
-        IRQ_DEVC                = 40,
-        IRQ_SWDT                = 41,
-        IRQ_TTC0_0              = 42,
-        IRQ_TTC0_1              = 43,
-        IRQ_TTC0_2              = 44,
-        IRQ_DMAC_ABORT          = 45,
-        IRQ_DMAC0               = 46,
-        IRQ_DMAC1               = 47,
-        IRQ_DMAC2               = 48,
-        IRQ_DMAC3               = 49,
-        IRQ_SMC                 = 50,
-        IRQ_QSPI                = 51,
-        IRQ_GPIO                = 52,
-        IRQ_USB0                = 53,
-        IRQ_ETHERNET0           = 54,
-        IRQ_ETHERNET0_WAKEUP    = 55,
-        IRQ_SDIO0               = 56,
-        IRQ_I2C0                = 57,
-        IRQ_SPI0                = 58,
-        IRQ_UART0               = 59,
-        IRQ_CAN0                = 60,
-        IRQ_PL0                 = 61,
-        IRQ_PL1                 = 62,
-        IRQ_PL2                 = 63,
-        IRQ_PL3                 = 64,
-        IRQ_PL4                 = 65,
-        IRQ_PL5                 = 66,
-        IRQ_PL6                 = 67,
-        IRQ_PL7                 = 68,
-        IRQ_TTC1_0              = 69,
-        IRQ_TTC1_1              = 70,
-        IRQ_TTC1_2              = 71,
-        IRQ_DMAC4               = 72,
-        IRQ_DMAC5               = 73,
-        IRQ_DMAC6               = 74,
-        IRQ_DMAC7               = 75,
-        IRQ_USB1                = 76,
-        IRQ_ETHERNET1           = 76,
-        IRQ_ETHERNET1_WAKEUP    = 78,
-        IRQ_SDIO1               = 79,
-        IRQ_I2C1                = 80,
-        IRQ_SPI1                = 81,
-        IRQ_UART1               = 82,
-        IRQ_CAN1                = 83,
-        IRQ_PL8                 = 84,
-        IRQ_PL9                 = 85,
-        IRQ_PL10                = 86,
-        IRQ_PL11                = 87,
-        IRQ_PL12                = 88,
-        IRQ_PL13                = 89,
-        IRQ_PL14                = 90,
-        IRQ_PL15                = 91,
-        IRQ_PARITY              = 92,
+        IRQ_GIC0                = 16,
+        IRQ_GIC1                = 17,
+        IRQ_GIC2                = 18,
+        IRQ_GIC3                = 19,
+        IRQ_GIC4                = 20,
+        IRQ_GIC5                = 21,
+        IRQ_GIC6                = 22,
+        IRQ_GIC7                = 23,
+        IRQ_GIC8                = 24,
+        IRQ_GIC9                = 25,
+        IRQ_GIC10               = 26,
+        IRQ_GIC11_GLOBAL_TIMER  = 27,
+        IRQ_GIC12               = 28,
+        IRQ_GIC13               = 29, //private timer
+        IRQ_GIC14               = 30,
+        IRQ_GIC15               = 31,
+        IRQ_WATCHDOG            = 32,
+        IRQ_SOFTWARE            = 33,
+        IRQ_COMMRX              = 34,
+        IRQ_COMMTX              = 35,
+        IRQ_TIMER0AND1          = 36,
+        IRQ_TIMER2AND3          = 37,
+        IRQ_RTC                 = 42,
+        IRQ_UART0               = 44,
+        IRQ_UART1               = 45,
+        IRQ_UART2               = 46,
+        IRQ_UART3               = 47,
+        IRQ_DMAC                = 56,
+        IRQ_T1_INT0             = 64,
+        IRQ_T1_INT1             = 65,
+        IRQ_T1_INT2             = 66,
+        IRQ_T1_INT3             = 67,
+        IRQ_T1_INT4             = 68,
+        IRQ_T1_INT5             = 69,
+        IRQ_T1_INT6             = 70,
+        IRQ_T1_INT7             = 71,
+        IRQ_T2_INT0             = 72,
+        IRQ_T2_INT1             = 73,
+        IRQ_T2_INT2             = 74,
+        IRQ_T2_INT3             = 75,
+        IRQ_T2_INT4             = 76,
+        IRQ_T2_INT5             = 77,
+        IRQ_T2_INT6             = 78,
+        IRQ_T2_INT7             = 79,
     };
 
     // Interrupts
-    static const unsigned int INTS = 93;
+    static const unsigned int INTS = 96;
     static const unsigned int EXC_INT = 0;
-    static const unsigned int HARD_INT = 16;
-    static const unsigned int SOFT_INT = 0;
     enum {
-        INT_TIMER       = IRQ_PRIVATE_TIMER,
-        INT_USER_TIMER0 = IRQ_GLOBAL_TIMER,
-        INT_USER_TIMER1 = 0,
-        INT_USER_TIMER2 = 0,
-        INT_USER_TIMER3 = 0,
-        INT_USB0         = IRQ_USB0,
-        INT_GPIOA       = IRQ_GPIO,
-        INT_GPIOB       = IRQ_GPIO,
-        INT_GPIOC       = IRQ_GPIO,
-        INT_GPIOD       = IRQ_GPIO,
-        INT_NIC0_RX     = IRQ_ETHERNET0,
-        INT_NIC0_TX     = IRQ_ETHERNET0,
-        INT_NIC0_ERR    = IRQ_ETHERNET0,
-        INT_NIC0_TIMER  = 0,
-        INT_FIRST_HARD  = HARD_INT,
-        INT_LAST_HARD   = IRQ_PARITY,
-        INT_RESCHEDULER = IRQ_SOFTWARE0
+        INT_TIMER = IRQ_GIC13, //private timer
+        INT_USER_TIMER0  = IRQ_GIC11_GLOBAL_TIMER,  //global
+        INT_USER_TIMER1  = IRQ_TIMER0AND1,
+        INT_USER_TIMER2  = IRQ_TIMER2AND3,
+        INT_USER_TIMER3  = IRQ_TIMER2AND3,
+        INT_RESCHEDULER  = IRQ_SOFTWARE0,
     };
 
 public:
@@ -131,44 +97,38 @@ public:
     static int int2irq(int i) { return i; }
 
     static void enable() {
-        dist(ICDISER0) = ~0;
-        dist(ICDISER1) = ~0;
-        dist(ICDISER2) = ~0;
+        int_dist(GIC_DIST_SETENABLE0) = ~0;
+        int_dist(GIC_DIST_SETENABLE1) = ~0;
+        int_dist(GIC_DIST_SETENABLE2) = ~0;
     }
 
-    static void enable(int i) { dist(ICDISER0 + (i/32)*4) = 1 << (i%32); }
+    static void enable(const Interrupt_Id & id) {
+        int_dist(GIC_DIST_SETENABLE0 + (id / 32) * 4) = 1 << (id % 32);
+    }
 
     static void disable() {
-        dist(ICDICER0) = ~0;
-        dist(ICDICER1) = ~0;
-        dist(ICDICER1) = ~0;
+        int_dist(GIC_DIST_CLEARENABLE0) = ~0;
+        int_dist(GIC_DIST_CLEARENABLE1) = ~0;
+        int_dist(GIC_DIST_CLEARENABLE2) = ~0;
     }
 
-    static void disable(int i) { dist(ICDICER0 + (i/32)*4) = 1 << (i%32); }
-
-    static Interrupt_Id int_id() {
-        Reg32 icciar = cpu_itf(ICCIAR) & INT_ID_MASK;
-
-        // For every read of a valid interrupt id from the ICCIAR, the ISR must
-        // perform a matching write to the ICCEOIR
-        cpu_itf(ICCEOIR) = icciar;
-        return icciar;
+    static void disable(const Interrupt_Id & id) {
+        int_dist(GIC_DIST_CLEARENABLE0 + (id / 32) * 4) = 1 << (id % 32);
     }
 
-    static void init(void) {
-        // Enable distributor
-        dist(ICDDCR) = DIST_EN_S;
+    // Only works in handler mode (inside IC::entry())
+    static Interrupt_Id int_id() { return CPU::flags() & 0x3f; }
 
-        // Mask no interrupt
-        cpu_itf(ICCPMR) = 0xF0;
-
-        // Enable interrupts signaling by the CPU interfaces to the connected
-        // processors
-        cpu_itf(ICCICR) = ACK_CTL | ITF_EN_NS | ITF_EN_S;
-    }
-
-protected:
-    static const unsigned int INT_ID_MASK = 0x3FF;
+    static void init() {
+        // Set interrup priority mask
+        gic(GIC_PRIORITY_CONTROL) = 0xFF;
+        
+        // Enable CPU interface control register to signal interrupts
+        gic(GIC_CPU_CONTROL) = 1;
+    
+        // Enable distributor control register to send interrupts to CPUs
+        int_dist(GIC_DIST_CONTROL_REGISTER) = 1;
+    };
 };
 
 class IC: private GIC
@@ -176,7 +136,6 @@ class IC: private GIC
     friend class Machine;
 
 private:
-
     typedef GIC Engine;
 
 public:
@@ -187,15 +146,6 @@ public:
     using Engine::INT_USER_TIMER1;
     using Engine::INT_USER_TIMER2;
     using Engine::INT_USER_TIMER3;
-    using Engine::INT_GPIOA;
-    using Engine::INT_GPIOB;
-    using Engine::INT_GPIOC;
-    using Engine::INT_GPIOD;
-    using Engine::INT_USB0;
-    using Engine::INT_NIC0_RX;
-    using Engine::INT_NIC0_TX;
-    using Engine::INT_NIC0_ERR;
-    using Engine::INT_NIC0_TIMER;
     using Engine::INT_RESCHEDULER;
 
 public:
@@ -246,8 +196,8 @@ public:
     void fiq();
 
 private:
-    static void dispatch(unsigned int i);
-    static void eoi(unsigned int i);
+    static void dispatch(unsigned int i); //depois aq
+    static void eoi(unsigned int i); //primeiro aqui
 
     // Logical handlers
     static void int_not(const Interrupt_Id & i);

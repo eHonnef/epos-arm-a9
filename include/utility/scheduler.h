@@ -41,30 +41,6 @@ namespace Scheduling_Criteria
         volatile int _priority;
     };
 
-    // Feedback
-    class FB: public Priority
-    {
-    public:
-        enum {
-            MAIN   = 0,
-            NORMAL = 1,
-            IDLE   = (unsigned(1) << (sizeof(int) * 8 - 1)) - 1
-        };
-
-        static const bool timed = true;
-        static const bool dynamic = true;
-        static const bool preemptive = true;
-
-    public:
-        FB(int p = NORMAL): Priority(p) {}
-
-        FB operator+=(const FB & p) { 
-            _priority += p._priority;
-            return *this;
-        }
-
-    };
-
     // Round-Robin
     class RR: public Priority
     {
@@ -100,12 +76,51 @@ namespace Scheduling_Criteria
     public:
         FCFS(int p = NORMAL); // Defined at Alarm
     };
+
+    class Variable_Queue
+    {
+    public:
+        enum {ANY = -1};
+
+    protected:
+        Variable_Queue(unsigned int queue): _queue(queue) {};
+
+    public:
+        const volatile unsigned int & queue() const volatile { return _queue; }
+
+    protected:
+        volatile unsigned int _queue;
+        static volatile unsigned int _next_queue;
+    };
+
+    // CPU Affinity
+    class CPU_Affinity: public Priority, public Variable_Queue
+    {
+    public:
+        static const bool timed = false;
+        static const bool dynamic = false;
+        static const bool preemptive = true;
+
+        static const unsigned int QUEUES = Traits<Machine>::CPUS;
+
+    public:
+        CPU_Affinity(int p = NORMAL, int cpu = ANY)
+        : Priority(p), Variable_Queue(((_priority == IDLE) || (_priority == MAIN)) ? Machine::cpu_id() : (cpu != ANY) ? cpu : ++_next_queue %= Machine::n_cpus()) {}
+
+        using Variable_Queue::queue;
+
+        static unsigned int current_queue() { return Machine::cpu_id(); }
+    };
 }
 
 
 // Scheduling_Queue
 template<typename T, typename R = typename T::Criterion>
 class Scheduling_Queue: public Scheduling_List<T> {};
+
+template<typename T>
+class Scheduling_Queue<T, Scheduling_Criteria::CPU_Affinity>:
+public Scheduling_Multilist<T> {};
 
 // Scheduler
 // Objects subject to scheduling by Scheduler must declare a type "Criterion"

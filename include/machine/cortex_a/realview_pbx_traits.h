@@ -1,4 +1,4 @@
-// EPOS Realview_PBX (ARM Cortex-A9) MCU Metainfo and Configuration
+// EPOS Realview PBX (ARM Cortex-A9) MCU Metainfo and Configuration
 
 #ifndef __machine_traits_h
 #define __machine_traits_h
@@ -17,28 +17,31 @@ template<> struct Traits<Machine>: public Traits<Machine_Common>
 {
     static const unsigned int CPUS = Traits<Build>::CPUS;
 
-    // Physical Memory 
+    // Physical Memory
     static const unsigned int MEM_BASE    = 0x00000000;
-    static const unsigned int MEM_TOP     = 0x0FFFFFFF;
-    static const unsigned int BOOT_STACK  = 0x0FFFFFF0; // MEM_TOP - sizeof(int)
+    static const unsigned int VECTOR_TABLE= 0x00010000;
+    static const unsigned int PAGE_TABLES = 0x07f00000;
+    static const unsigned int MEM_TOP     = 0x07ffffff;
 
+    static const unsigned int BOOT        = 0x00000000;
+    static const unsigned int BOOT_STACK  = 0x07effffc; 
     // Logical Memory Map
-    static const unsigned int APP_LOW   = 0x00000000;
-    static const unsigned int APP_CODE  = 0x00000000;
-    static const unsigned int APP_DATA  = 0x03100000;
-    static const unsigned int APP_HIGH  = 0x06100000;
+    static const unsigned int APP_LOW     = 0x00000000;
+    static const unsigned int APP_CODE    = 0x00010000;
+    static const unsigned int APP_DATA    = 0x00010000;
+    static const unsigned int APP_HIGH    = 0x07ffffff;
 
-    static const unsigned int PHY_MEM   = 0x00000000;
-    static const unsigned int IO_BASE   = 0x00000000;
-    static const unsigned int IO_TOP    = 0x00000000;
+    static const unsigned int PHY_MEM     = 0x80000000;
+    static const unsigned int IO_BASE     = 0xf0000000;
+    static const unsigned int IO_TOP      = 0xff400000;
 
-    static const unsigned int SYS       = 0x06100000;
-    static const unsigned int SYS_CODE  = 0x06100000;
-    static const unsigned int SYS_DATA  = 0x07100000;
+    static const unsigned int SYS         = IO_TOP;
+    static const unsigned int SYS_CODE    = 0xff700000;
+    static const unsigned int SYS_DATA    = 0xff740000;
 
     // Default Sizes and Quantities
-    static const unsigned int STACK_SIZE = 16 * 1024;
-    static const unsigned int HEAP_SIZE = 16 * 1024 * 1024;
+    static const unsigned int STACK_SIZE  = 16 * 1024;
+    static const unsigned int HEAP_SIZE   = 16 * 1024 * 1024;
     static const unsigned int MAX_THREADS = 16;
 };
 
@@ -63,8 +66,8 @@ template<> struct Traits<UART>: public Traits<Machine_Common>
 
     static const unsigned int CLOCK = Traits<CPU>::CLOCK;
 
-    static const unsigned int DEF_UNIT = 0;
-    static const unsigned int DEF_BAUD_RATE = 38400;
+    static const unsigned int DEF_UNIT = 1;
+    static const unsigned int DEF_BAUD_RATE = 115200;
     static const unsigned int DEF_DATA_BITS = 8;
     static const unsigned int DEF_PARITY = 0; // none
     static const unsigned int DEF_STOP_BITS = 1;

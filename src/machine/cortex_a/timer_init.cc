@@ -5,8 +5,7 @@
 
 __BEGIN_SYS
 
-void Timer::init()
-{
+void Timer::init() {
     db<Init, Timer>(TRC) << "Timer::init()" << endl;
 
     Engine::init(FREQUENCY);

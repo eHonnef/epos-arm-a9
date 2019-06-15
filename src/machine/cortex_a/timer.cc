@@ -4,6 +4,8 @@
 
 __BEGIN_SYS
 
+//Basically the same as LM3S811
+
 // Class attributes
 Timer * Timer::_channels[CHANNELS];
 

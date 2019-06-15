@@ -131,7 +131,7 @@ namespace Scheduling_Criteria
     class Priority;
     class FCFS;
     class RR;
-    class FB;
+    class CPU_Affinity;
 };
 
 class Address_Space;

@@ -8,6 +8,9 @@
 #include __MODEL_H
 #include <machine/common/pl011.h>
 
+//TODO: fazer isso
+// botar uart.c no cortex_a
+
 __BEGIN_SYS
 
 class UART: private UART_Common, private PL011

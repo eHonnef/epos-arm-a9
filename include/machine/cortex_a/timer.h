@@ -12,13 +12,12 @@
 
 __BEGIN_SYS
 
-
 // Cortex-A Private Timer
 class System_Timer_Engine: public Machine_Model
 {
 public:
     typedef CPU::Reg32 Count;
-    static const unsigned int CLOCK = Traits<CPU>::CLOCK/2;
+    static const unsigned int CLOCK = Traits<CPU>::CLOCK / 2;
 
 protected:
     System_Timer_Engine() {}
@@ -26,18 +25,18 @@ protected:
 public:
     static TSC::Hertz clock() { return CLOCK; }
 
-    static void enable() { priv_timer(PTCLR) |= TIMER_ENABLE; }
-    static void disable() { priv_timer(PTCLR) &= ~TIMER_ENABLE; }
+    static void enable() { priv_timer(PTCLR) |= PT_TIMER_ENABLE; }
+    static void disable() { priv_timer(PTCLR) &= ~PT_TIMER_ENABLE; }
 
-    static void eoi(const IC::Interrupt_Id & int_id) { priv_timer(PTISR) = INT_CLR; }
+    static void eoi(const IC::Interrupt_Id & int_id) { priv_timer(PTISR) = PT_INT_CLR; }
 
     void power(const Power_Mode & mode);
 
     static void init(unsigned int f) {
         priv_timer(PTCLR) = 0;
-        priv_timer(PTISR) = INT_CLR;
+        priv_timer(PTISR) = PT_INT_CLR;
         priv_timer(PTLR) = CLOCK / f;
-        priv_timer(PTCLR) = IRQ_EN | AUTO_RELOAD;
+        priv_timer(PTCLR) = PT_IRQ_EN | PT_AUTO_RELOAD;
     }
 };
 
@@ -82,7 +81,7 @@ public:
     }
 
 protected:
-    static void eoi(const IC::Interrupt_Id & int_id) { global_timer(GTISR) = INT_CLR; }
+    static void eoi(const IC::Interrupt_Id & int_id) {}
 };
 
 // Tick timer used by the system
@@ -156,6 +155,7 @@ private:
     static Hertz count2freq(const Count & c) { return c ? Engine::clock() / c : 0; }
     static Count freq2count(const Hertz & f) { return f ? Engine::clock() / f : 0;}
 
+    //TODO
     static void int_handler(const Interrupt_Id & i);
 
     static void init();
@@ -194,7 +194,7 @@ public:
 // User timer
 class User_Timer: private Timer_Common, private User_Timer_Engine
 {
-    // friend class PWM;
+    friend class PWM;
 
 private:
     typedef User_Timer_Engine Engine;
@@ -224,6 +224,7 @@ public:
 
     Microsecond read() { return count2us(Engine::read()); }
 
+    //TODO
     void enable() { Engine::enable(); }
     void disable() { Engine::disable(); }
     void power(const Power_Mode & mode) { power_user_timer(_channel, mode); }

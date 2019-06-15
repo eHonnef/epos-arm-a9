@@ -20,17 +20,22 @@ class Machine: private Machine_Common, private Machine_Model
 public:
     Machine() {}
 
-    static void delay(const RTC::Microsecond & time) { Machine_Model::delay(time); }// @TODO: so coloquei o retorno pra funcionar
+    static void delay(const RTC::Microsecond & time) { Machine_Model::delay(time); };
     
     static void panic();
     static void reboot();
-    static void poweroff() { reboot(); }
+    static void poweroff();
 
     static unsigned int n_cpus() { return Traits<Build>::CPUS; }
-    static unsigned int cpu_id() { return Machine_Model::cpu_id(); }
+    static unsigned int cpu_id() {
+        int id;
+        ASM("mrc p15, 0, %0, c0, c0, 5" : "=r"(id) : : );
+        return id & 0x3;
+    }
 
-    static void smp_barrier();
-    static void smp_init(unsigned int);
+    static void smp_barrier() {}
+
+    static void smp_init(unsigned int n_cpus) {}
 
     static const UUID & uuid() { return Machine_Model::uuid(); }
 

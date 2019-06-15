@@ -312,11 +312,6 @@ void Thread::reschedule()
 void Thread::time_slicer(const IC::Interrupt_Id & i)
 {
     lock();
-    
-    if (Criterion::dynamic && running()->_link.rank() < Criterion::IDLE - 1 &&
-            running()->_link.rank() != Criterion::MAIN) {
-        running()->_link.demote();
-    }
 
     reschedule();
 }
