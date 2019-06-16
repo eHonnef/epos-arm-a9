@@ -1,2 +1,6 @@
 .vscode/
+bin/*
 *.o
+*.a
+*.conf
+**/*_traits.h
