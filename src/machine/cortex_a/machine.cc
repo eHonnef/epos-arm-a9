@@ -35,7 +35,7 @@ void Machine::smp_barrier()
 
         CPU::finc(ready[j]);
         if(cpu_id() == 0) {
-            while(ready[j] < n_cpus()); // wait for all CPUs to be ready
+            while(ready[j] < Traits<Build>::CPUS); // wait for all CPUs to be ready
             i = !i;                   // toggle ready
             ready[j] = 0;             // signalizes waiting CPUs
         } else {

@@ -191,7 +191,25 @@ public:
 
     using Engine::irq2int;
 
-    static void ipi_send(unsigned int cpu, Interrupt_Id int_id) {}
+    //Wake idle threads
+    //cpu is the target core to wake
+    //int_id is the type of interrupt
+    static void ipi_send(unsigned int cpu, Interrupt_Id int_id) {
+        /*ASM(" \t\n\
+            LDR r0, =%0 \t\n\
+            LDR r1, =%1 \t\n\
+            AND     r3, r0, #0x0F         // Mask off unused bits of ID, and move to r3 \t\n\
+            AND     r1, r1, #0x0F        // Mask off unused bits of target_filter \t\n\
+                                                                                \t\n\
+            ORR     r3, r3, r1, LSL #16     // Combine ID and target_filter \t\n\
+                                                                                \t\n\
+            // Get the address of the GIC                                                           \t\n\
+            MRC     p15, 4, r0, c15, c0, 0  // Read periph base address     \t\n\
+            ADD     r0, r0, #0x1F00         // Add offset of the sgi_trigger reg    \t\n\
+                                                                                            \t\n\
+            STR     r3, [r0]                // Write to the Software Generated Interrupt Register  (ICDSGIR) \t\n\
+        " :: "p"(cpu), "p"(int_id));*/
+    }
 
     void undefined_instruction();
     void software_interrupt();
