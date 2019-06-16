@@ -59,12 +59,13 @@ ARCH_TRAITS	= $(TRAITS)
 else
 ARCH_TRAITS	= $(INCLUDE)/architecture/$(ARCH)/traits.h
 endif
-MODE		= $(call TOLOWER,$(call GETTK,MODE,$(TRAITS)))
+SMOD		= $(call TOLOWER,$(call GETTK,MODE,$(TRAITS)))
 ARCH		= $(call TOLOWER,$(call GETTK,ARCHITECTURE,$(TRAITS)))
 MACH		= $(call TOLOWER,$(call GETTK,MACHINE,$(TRAITS)))
 MMOD		= $(call TOLOWER,$(call GETTK,MODEL,$(TRAITS)))
-CPUS		= $(call GETTK,CPUS,$(TRAITS))
-NODES		= $(call GETTK,NODES,$(TRAITS))
+CPUS        = $(shell $(BIN)/eposcfg CPUS 2> /dev/null)
+NODES		= $(shell $(BIN)/eposcfg NODES 2> /dev/null)
+STIME		= $(shell $(BIN)/eposcfg EXPECTED_SIMULATION_TIME 2> /dev/null)
 LIBARCH		= $(LIB)/lib$(LARCHNAME)_$(ARCH).a
 LIBMACH		= $(LIB)/lib$(LMACHNAME)_$(ARCH).a
 LIBSYS		= $(LIB)/lib$(LSYSNAME)_$(ARCH).a
@@ -83,27 +84,19 @@ avr8_COMP_PREFIX	:= /usr/local/avr/gcc-4.4.4/bin/avr-
 COMP_PREFIX		= $($(ARCH)_COMP_PREFIX)
 
 # Boot Memory Map
-MEM_BASE		= $(call GETTK,MEM_BASE,$(MACH_TRAITS))
-MEM_TOP			= $(call GETTK,MEM_TOP,$(MACH_TRAITS))
-MEM_SIZE		= $(shell echo "(`printf "%d" $(MEM_TOP)` + 1 - `printf "%d" $(MEM_BASE)`) / 1024"|bc)
-BOOT_ADDR		= $(call GETTK,BOOT,$(MACH_TRAITS))
-BOOT_STACK_ADDR         = $(call GETTK,BOOT_STACK,$(MACH_TRAITS))
-SETUP_ADDR		= $(call GETTK,SETUP,$(MACH_TRAITS))
-INIT_ADDR		= $(call GETTK,INIT,$(MACH_TRAITS))
-SYS_CODE_ADDR		= $(call GETTK,SYS_CODE,$(MACH_TRAITS))
-SYS_DATA_ADDR		= $(call GETTK,SYS_DATA,$(MACH_TRAITS))
-APP_CODE_ADDR		= $(call GETTK,APP_CODE,$(MACH_TRAITS))
-APP_DATA_ADDR		= $(call GETTK,APP_DATA,$(MACH_TRAITS))
-BOOT_LENGTH_MIN		= $(call GETTK,BOOT_LENGTH_MIN,$(MACH_TRAITS))
-BOOT_LENGTH_MAX		= $(call GETTK,BOOT_LENGTH_MAX,$(MACH_TRAITS))
-NODE_ID			= $(call GETTK,NODE_ID,$(MACH_TRAITS))
+MEM_SIZE		= $(shell $(BIN)/eposcfg MEM_SIZE_KB 2> /dev/null)
+BOOT_ADDR               = $(shell $(BIN)/eposcfg BOOT 2> /dev/null)
+SETUP_ADDR              = $(shell $(BIN)/eposcfg SETUP 2> /dev/null)
+INIT_ADDR               = $(shell $(BIN)/eposcfg INIT 2> /dev/null)
+SYS_CODE_ADDR           = $(shell $(BIN)/eposcfg SYS_CODE 2> /dev/null)
+SYS_DATA_ADDR           = $(shell $(BIN)/eposcfg SYS_DATA 2> /dev/null)
 UUID			= $(shell cat /proc/sys/kernel/random/uuid | sed 's/-//g')
 
 #Machine specifics
 pc_CC_FLAGS		:= -Wa,--32 -Wno-builtin-declaration-mismatch -Wno-array-bounds
 pc_AS_FLAGS		:= --32
 pc_LD_FLAGS		:=
-pc_EMULATOR		= qemu-system-i386 -smp $(CPUS) -m $(MEM_SIZE)k -nographic -no-reboot -drive format=raw,index=0,if=floppy,read-only,file=
+pc_EMULATOR		= qemu-system-i386  -D /tmp/qemu-debug-log -d int,page,mmu,pcall,unimp,cpu_reset,guest_errors -smp $(CPUS) -m $(MEM_SIZE)k -nographic -no-reboot -drive format=raw,index=0,if=floppy,read-only,file=
 pc_DEBUGGER		:= gdb
 pc_FLASHER		:=
 pc_MAGIC		:= --nmagic
@@ -118,9 +111,9 @@ ifeq ($(MMOD),zynq)
 cortex_a_EMULATOR	= qemu-system-arm -machine xilinx-zynq-a9  -smp $(CPUS) -m $(MEM_SIZE)k -serial null -serial mon:stdio -nographic -no-reboot -kernel 
 endif
 ifeq ($(MMOD),realview_pbx)
-cortex_a_EMULATOR	= qemu-system-arm -machine realview-pbx-a9 -smp $(CPUS) -m $(MEM_SIZE)k -serial null -serial mon:stdio -nographic -no-reboot -kernel 
+cortex_a_EMULATOR	= qemu-system-arm -machine realview-pbx-a9 -d guest_errors -smp $(CPUS) -m $(MEM_SIZE)k -serial null -serial mon:stdio -nographic -no-reboot -kernel 
 endif
-cortex_a_DEBUGGER	:= arm-none-eabi-gdb
+cortex_a_DEBUGGER	:= gdb-multiarch
 cortex_a_FLASHER	= $(TLS)/eposflash/eposflash-$(MMOD) -d /dev/ttyACM0 -f
 cortex_a_MAGIC		:= --omagic
 cortex_a_CODE_NAME	:= .init
@@ -195,7 +188,7 @@ TLDFLAGS	:= -m32
 ACC		= $(BIN)/eposcc $(MACH_CC_FLAGS) -c -ansi -O
 ACXX		= $(BIN)/eposcc $(MACH_CC_FLAGS) -c -ansi -O
 AF77		= $(BIN)/eposcc $(MACH_CC_FLAGS) -c -ansi -O
-ALD		= $(BIN)/eposcc --$(MODE) --no-warn-mismatch
+ALD		= $(BIN)/eposcc --$(SMOD) --no-warn-mismatch
 ALDFLAGS	:= --gc-sections $(MACH_MAGIC)
 
 # Tools and flags to compile the system

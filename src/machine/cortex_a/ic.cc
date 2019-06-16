@@ -18,6 +18,7 @@ __BEGIN_SYS
 // Class attributes
 IC::Interrupt_Handler IC::_int_vector[IC::INTS];
 
+// Class methods
 void IC::dispatch(unsigned int i)
 {
     Interrupt_Id id = int_id();
@@ -44,7 +45,6 @@ void IC::eoi(unsigned int id)
         _eoi_vector[id](id);
 }
 
-// Class methods
 void IC::entry()
 {
     ASM(".equ MODE_IRQ, 0x12                        \n"
@@ -79,8 +79,6 @@ void IC::entry()
         // irq_spsr to be restored into svc_cpsr
         "ldmfd sp!, {r0-r3, r12, lr, pc}^           \n" : : "i"(dispatch));
 }
-
-//void IC::reset() {}
 
 void IC::int_not(const Interrupt_Id & i)
 {

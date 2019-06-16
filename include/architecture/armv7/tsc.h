@@ -19,9 +19,11 @@ private:
 
     enum {
         TSC_BASE =
-            Traits<Build>::MODEL == Traits<Build>::eMote3  ? 0x40033000 /*TIMER3_BASE*/ :
-            Traits<Build>::MODEL == Traits<Build>::LM3S811 ? 0x40031000 /*TIMER1_BASE*/ :
-            Traits<Build>::MODEL == Traits<Build>::Zynq ? 0xF8F00200 /*GLOBAL_TIMER_BASE*/ : 
+            Traits<Build>::MODEL == Traits<Build>::eMote3  ?      0x40033000 : // TIMER3_BASE
+            Traits<Build>::MODEL == Traits<Build>::LM3S811 ?      0x40031000 : // TIMER1_BASE
+            Traits<Build>::MODEL == Traits<Build>::Zynq ?         0xf8f00200 : // GLOBAL_TIMER_BASE
+            Traits<Build>::MODEL == Traits<Build>::Realview_PBX ? 0x1f000200 : // GLOBAL_TIMER_BASE
+            Traits<Build>::MODEL == Traits<Build>::Realview_PBX ? 0x1F000200 :
             0
     };
 

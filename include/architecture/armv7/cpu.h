@@ -133,9 +133,9 @@ public:
         ASM("msr cpsr_all, %0" : : "r"(flags) : "cc");
     }
 
-    static void int_enable() { flags(flags() & ~0xc0); }
-    static void int_disable() { flags(flags() | 0xc0); }
-    static bool int_disabled() { return flags() & 0xc0; }
+    static void int_enable() { flags(flags() & ~(FLAG_F | FLAG_I)); }
+    static void int_disable() { flags(flags() | (FLAG_F | FLAG_I)); }
+    static bool int_disabled() { return flags() & (FLAG_F | FLAG_I); }
 
     static void mrs12() { ASM("mrs r12, cpsr_all" : : : "r12"); }
     static void msr12() { ASM("msr cpsr_all, r12" : : : "cc"); }

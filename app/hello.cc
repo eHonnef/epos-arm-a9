@@ -1,12 +1,14 @@
-#include <utility/ostream.h>
+#include <process.h>
+#include <time.h>
 
 using namespace EPOS;
 
 OStream cout;
 
-int main()
-{
-    cout << "====================== Hello world! =======================" << endl;
-
+int main() {
+    while (true) {
+        Alarm::delay(10000000);
+        cout << "teste" << endl;
+    }
     return 0;
 }

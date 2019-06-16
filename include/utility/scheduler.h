@@ -7,7 +7,7 @@
 #include <utility/list.h>
 #include <machine/timer.h>
 
-__BEGIN_SYS
+__BEGIN_UTIL
 
 // All scheduling criteria, or disciplines, must define operator int() with
 // the semantics of returning the desired order of a given object within the
@@ -27,15 +27,31 @@ namespace Scheduling_Criteria
             IDLE   = (unsigned(1) << (sizeof(int) * 8 - 1)) - 1
         };
 
+        // Constructor helpers
+        enum {
+            ANY         = -1
+        };
+
         // Policy traits
         static const bool timed = false;
         static const bool dynamic = false;
         static const bool preemptive = true;
+        static const unsigned int QUEUES = 1;
 
     public:
-        Priority(int p = NORMAL): _priority(p) {}
+        template <typename ... Tn>
+        Priority(int p = NORMAL, Tn & ... an): _priority(p) {}
 
         operator const volatile int() const volatile { return _priority; }
+
+        Priority operator +=(Priority rhs) {
+            if(_priority < (IDLE - rhs)) {
+                _priority += rhs;
+            }
+            return *this;
+        }
+
+        unsigned int queue() const { return 0; }
 
     protected:
         volatile int _priority;
@@ -45,6 +61,19 @@ namespace Scheduling_Criteria
     class RR: public Priority
     {
     public:
+        static const bool timed = true;
+        static const bool dynamic = false;
+        static const bool preemptive = true;
+
+    public:
+        template <typename ... Tn>
+        RR(int p = NORMAL, Tn & ... an): Priority(p) {}
+    };
+
+    // Feedback Scheduling
+    class FS: public Priority
+    {
+    public:
         enum {
             MAIN   = 0,
             NORMAL = 1,
@@ -52,36 +81,32 @@ namespace Scheduling_Criteria
         };
 
         static const bool timed = true;
-        static const bool dynamic = false;
+        static const bool dynamic = true;
         static const bool preemptive = true;
 
     public:
-        RR(int p = NORMAL): Priority(p) {}
+        FS(int p = NORMAL): Priority(p) {}
     };
 
     // First-Come, First-Served (FIFO)
     class FCFS: public Priority
     {
     public:
-        enum {
-            MAIN   = 0,
-            NORMAL = 1,
-            IDLE   = (unsigned(1) << (sizeof(int) * 8 - 1)) - 1
-        };
-
         static const bool timed = false;
         static const bool dynamic = false;
         static const bool preemptive = false;
 
     public:
-        FCFS(int p = NORMAL); // Defined at Alarm
+        FCFS(int p = NORMAL);
+
+        template <typename ... Tn>
+        FCFS(Tn & ... an) {}
     };
 
+
+    // Multicore Algorithms
     class Variable_Queue
     {
-    public:
-        enum {ANY = -1};
-
     protected:
         Variable_Queue(unsigned int queue): _queue(queue) {};
 
@@ -92,7 +117,7 @@ namespace Scheduling_Criteria
         volatile unsigned int _queue;
         static volatile unsigned int _next_queue;
     };
-
+    
     // CPU Affinity
     class CPU_Affinity: public Priority, public Variable_Queue
     {
@@ -104,7 +129,8 @@ namespace Scheduling_Criteria
         static const unsigned int QUEUES = Traits<Machine>::CPUS;
 
     public:
-        CPU_Affinity(int p = NORMAL, int cpu = ANY)
+        template <typename ... Tn>
+        CPU_Affinity(int p = NORMAL, int cpu = ANY, Tn & ... an)
         : Priority(p), Variable_Queue(((_priority == IDLE) || (_priority == MAIN)) ? Machine::cpu_id() : (cpu != ANY) ? cpu : ++_next_queue %= Machine::n_cpus()) {}
 
         using Variable_Queue::queue;
@@ -208,6 +234,6 @@ public:
     }
 };
 
-__END_SYS
+__END_UTIL
 
 #endif

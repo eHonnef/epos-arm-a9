@@ -5,7 +5,7 @@
 #include <machine/timer.h>
 #include <machine/usb.h>
 #include <machine/gpio.h>
-//#include <machine/nic.h>
+// #include <machine/nic.h>
 
 __BEGIN_SYS
 
@@ -110,7 +110,7 @@ IC::Interrupt_Handler IC::_eoi_vector[INTS] = {
 // Class methods
 void IC::init()
 {
-    //db<Init, IC>(TRC) << "IC::init()" << endl;
+    db<Init, IC>(TRC) << "IC::init()" << endl;
 
     CPU::int_disable(); // will be reenabled at Thread::init() by Context::load()
     Engine::init();

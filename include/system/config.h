@@ -7,11 +7,11 @@
 // ARCHITECTURE, MACHINE, AND APPLICATION SELECTION
 // This section is generated automatically from makedefs by $EPOS/etc/makefile
 //============================================================================
-#define MODE library
+#define SMOD library
 #define ARCH armv7
 #define MACH cortex_a
 #define MMOD realview_pbx
-#define APPL hello
+#define APPL philosophers_dinner
 #define __mode_library__
 #define __arch_armv7__
 #define __mach_cortex_a__
@@ -103,6 +103,9 @@ namespace EPOS {
 #define __AES_H                 __HEADER_MACH(aes)
 #define __ipv4__
 #define __tstp__
+
+#define __KEYPAD_H              __HEADER_TRAN(keypad)
+
 #endif
 
 #ifdef __mmod_lm3s811__
