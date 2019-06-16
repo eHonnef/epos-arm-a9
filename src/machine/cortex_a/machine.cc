@@ -25,7 +25,7 @@ void Machine::reboot()
     Machine_Model::reboot();
 }
 
-void Machine::smp_barrier(unsigned long n_cpus)
+void Machine::smp_barrier()
 {
     static volatile unsigned long ready[2];
     static volatile unsigned long i;
@@ -35,7 +35,7 @@ void Machine::smp_barrier(unsigned long n_cpus)
 
         CPU::finc(ready[j]);
         if(cpu_id() == 0) {
-            while(ready[j] < n_cpus); // wait for all CPUs to be ready
+            while(ready[j] < n_cpus()); // wait for all CPUs to be ready
             i = !i;                   // toggle ready
             ready[j] = 0;             // signalizes waiting CPUs
         } else {

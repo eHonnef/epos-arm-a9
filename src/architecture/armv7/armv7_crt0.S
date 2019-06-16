@@ -13,13 +13,13 @@ _mcu_start:
         mov     sp, r0
 
         // Clear the BSS
-        eor     r0, r0
-        ldr     r1, =__bss_start__
-        ldr     r2, =__bss_end__
-.L1:    str     r0, [r1]
-        add     r1, #4
-        cmp     r1, r2
-        blt     .L1
+//        eor     r0, r0
+ //       ldr     r1, =__bss_start__
+//        ldr     r2, =__bss_end__
+//.L1:    str     r0, [r1]
+//        add     r1, #4
+//        cmp     r1, r2
+//        blt     .L1
 
         // Entry point called by SETUP for processors
         .section .text

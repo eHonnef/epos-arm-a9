@@ -60,7 +60,16 @@ void RealView_PBX::pre_init() {
         //Set location for other CPUs                                                                           \t\n\
         ldr r0, =0x00010000                                                                                     \t\n\
         ldr r1, =0x10000030                                                                                     \t\n\
-        str r0, [r1] 																							\t\n\
+        str r0, [r1] 																							                                              \t\n\
+         																							                                                          \t\n\
+        // Clear the BSS									                                                          \t\n\
+        eor     r0, r0									                                                            \t\n\
+        ldr     r1, =__bss_start__									                                                \t\n\
+        ldr     r2, =__bss_end__									                                                  \t\n\
+.L1:    str     r0, [r1]									                                                          \t\n\
+        add     r1, #4									                                                            \t\n\
+        cmp     r1, r2									                                                            \t\n\
+        blt     .L1									                                                                \t\n\
 	");
 
     // Acordando as outras CPUS
