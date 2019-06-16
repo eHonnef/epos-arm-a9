@@ -113,7 +113,7 @@ endif
 ifeq ($(MMOD),realview_pbx)
 cortex_a_EMULATOR	= qemu-system-arm -machine realview-pbx-a9 -d guest_errors -smp $(CPUS) -m $(MEM_SIZE)k -serial null -serial mon:stdio -nographic -no-reboot -kernel 
 endif
-cortex_a_DEBUGGER	:= gdb-multiarch
+cortex_a_DEBUGGER	:= arm-none-eabi-gdb
 cortex_a_FLASHER	= $(TLS)/eposflash/eposflash-$(MMOD) -d /dev/ttyACM0 -f
 cortex_a_MAGIC		:= --omagic
 cortex_a_CODE_NAME	:= .init

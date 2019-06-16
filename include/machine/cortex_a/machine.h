@@ -23,7 +23,7 @@ private:
 public:
     Machine() {}
 
-    static void delay(const RTC::Microsecond & time);
+    static void delay(const RTC::Microsecond & time) { Machine_Model::delay(time); }
     
     static void panic();
     static void reboot();

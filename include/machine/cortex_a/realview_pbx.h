@@ -168,21 +168,12 @@ public:
 protected:
     RealView_PBX() {}
 
-    static void reboot() {
-        // Reg32 val = scs(AIRCR) & (~((-1u / VECTKEY) * VECTKEY));
-        // val |= 0x05fa * VECTKEY | SYSRESREQ;
-        // scs(AIRCR) = val;
-    }
+    static void reboot() {}
 
     static void delay(const RTC::Microsecond & time) {
-        // assert(Traits<TSC>::enabled);
-        // unsigned long long ts = static_cast<unsigned long long>(time) * TSC::frequency() / 1000000;
-        // tsc(GPTMTAILR) = ts;
-        // tsc(GPTMTAPR) = ts >> 32;
-        // tsc(GPTMCTL) |= TAEN;
-        // while(!(tsc(GPTMRIS) & TATO_INT));
-        // tsc(GPTMCTL) &= ~TAEN;
-        // tsc(GPTMICR) |= TATO_INT;
+        assert(Traits<TSC>::enabled);
+        TSC::Time_Stamp end = TSC::time_stamp() + time * (TSC::frequency() / 1000000);
+        while(end > TSC::time_stamp());
     }
 
     static const UUID & uuid() { return System::info()->bm.uuid; } // TODO: System_Info is not populated in this machine
@@ -194,59 +185,12 @@ protected:
     }
 
     // Device enabling
-    static void enable_uart(unsigned int unit) {
-        // assert(unit < UARTS);
-        // power_uart(unit, FULL);
-        // gpioa(AFSEL) |= 3 << (unit * 2);                // Pins A[1:0] are multiplexed between GPIO and UART 0. Select UART.
-        // gpioa(DEN) |= 3 << (unit * 2);                  // Enable digital I/O on Pins A[1:0]
-    }
+    static void enable_uart(unsigned int unit) {}
 
     // Power Management
-    static void power_uart(unsigned int unit, const Power_Mode & mode) {
-        // assert(unit < UARTS);
-        // switch(mode) {
-        // case ENROLL:
-        // 	break;
-        // case DISMISS:
-        // 	break;
-        // case SAME:
-        // 	break;
-        // case FULL:
-        // 	break;
-        // case LIGHT:
-        // 	break;
-        // case SLEEP:
-        //     scr(RCGC1) |= 1 << unit;                   // Activate UART "unit" clock
-        //     scr(RCGC2) |= 1 << unit;                   // Activate port "unit" clock
-        //     break;
-        // case OFF:
-        //     scr(RCGC1) &= ~(1 << unit);                // Deactivate UART "unit" clock
-        //     scr(RCGC2) &= ~(1 << unit);                // Deactivate port "unit" clock
-        //     break;
-        // }
-    }
+    static void power_uart(unsigned int unit, const Power_Mode & mode) {}
 
-    static void power_user_timer(unsigned int unit, const Power_Mode & mode) {
-        // assert(unit < TIMERS);
-        // switch(mode) {
-        // case ENROLL:
-        // 	break;
-        // case DISMISS:
-        // 	break;
-        // case SAME:
-        // 	break;
-        // case FULL:
-        // 	break;
-        // case LIGHT:
-        // 	break;
-        // case SLEEP:
-        //     scr(RCGC1) |= 1 << (unit + 16);             // Activate GPTM "unit" clock
-        //     break;
-        // case OFF:
-        //     scr(RCGC1) &= ~(1 << (unit + 16));          // Deactivate GPTM "unit" clock
-        //     break;
-        // }
-    }
+    static void power_user_timer(unsigned int unit, const Power_Mode & mode) {}
 
 
 public:
