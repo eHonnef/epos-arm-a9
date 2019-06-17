@@ -18,6 +18,9 @@
 			"**/LICENCE": true,
 			"**/makedefs": true,
 			"**/*.o": true,
+		},
+		"files.associations": {
+			"*.tcc": "cpp"
 		}
 	}
 }

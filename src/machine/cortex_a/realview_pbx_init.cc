@@ -93,7 +93,7 @@ void RealView_PBX::pre_init() {
 
   } else if (Traits<System>::multicore) {
     ASM("\t\n\
-		//GIC processor interface enable                                                                        \t\n\
+		    //GIC processor interface enable                                                                        \t\n\
         MRC     p15, 4, r0, c15, c0, 0  // Read periph base address                                             \t\n\
         LDR     r1, [r0, #0x100]        // Read the Processor Interface Control register   (ICCICR/ICPICR)      \t\n\
         ORR     r1, r1, #0x03           // Bit 0: Enables secure interrupts, Bit 1: Enables Non-Secure interrupts \t\n\
