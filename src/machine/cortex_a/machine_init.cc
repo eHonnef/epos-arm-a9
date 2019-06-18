@@ -6,12 +6,15 @@ __BEGIN_SYS
 
 void Machine::pre_init(System_Info * si)
 {
-    Machine_Model::pre_init();
-
     Display::init();
 
-    // if(Traits<System>::multicore)
-    //     smp_init(si->bm.n_cpus);
+    if(Traits<IC>::enabled)
+        IC::init();
+
+    Machine_Model::pre_init();
+
+    if(Traits<System>::multicore)
+        smp_init(Traits<Build>::CPUS);
 }
 
 void Machine::init()
@@ -20,10 +23,12 @@ void Machine::init()
 
     Machine_Model::init();
 
-    if(Traits<IC>::enabled)
-        IC::init();
+    // if(Traits<IC>::enabled)
+    //     IC::init();
     if(Traits<Timer>::enabled)
         Timer::init();
+
+
 #ifdef __USB_H
     if(Traits<USB>::enabled)
         USB::init();

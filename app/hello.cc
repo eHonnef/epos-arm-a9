@@ -8,7 +8,7 @@ OStream cout;
 int main() {
     while (true) {
         Alarm::delay(10000000);
-        cout << "teste" << endl;
+        cout << "Teste de delay" << endl;
     }
     return 0;
 }
