@@ -137,6 +137,18 @@ namespace Scheduling_Criteria
 
         static unsigned int current_queue() { return Machine::cpu_id(); }
     };
+
+    // Global Round-Robin
+    class GRR: public RR
+    {
+    public:
+        static const unsigned int HEADS = Traits<Machine>::CPUS;
+
+    public:
+        GRR(int p = NORMAL): RR(p) {}
+
+        static unsigned int current_head() { return Machine::cpu_id(); }
+    };
 }
 
 
@@ -147,6 +159,10 @@ class Scheduling_Queue: public Scheduling_List<T> {};
 template<typename T>
 class Scheduling_Queue<T, Scheduling_Criteria::CPU_Affinity>:
 public Scheduling_Multilist<T> {};
+
+template<typename T>
+class Scheduling_Queue<T, Scheduling_Criteria::GRR>:
+public Multihead_Scheduling_List<T> {};
 
 // Scheduler
 // Objects subject to scheduling by Scheduler must declare a type "Criterion"

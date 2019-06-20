@@ -89,6 +89,7 @@ namespace Scheduling_Criteria
     class RR;
     class FS;
     class CPU_Affinity;
+    class GRR;
 };
 
 __END_UTIL
