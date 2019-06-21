@@ -152,7 +152,7 @@ template<> struct Traits<Thread>: public Traits<void>
     static const bool smp = Traits<System>::multicore;
     static const bool trace_idle = hysterically_debugged;
 
-    typedef Scheduling_Criteria::GRR Criterion;
+    typedef Scheduling_Criteria::GFS Criterion;
     static const unsigned int QUANTUM = 10000; // us
 };
 

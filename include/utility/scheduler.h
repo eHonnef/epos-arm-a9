@@ -149,6 +149,18 @@ namespace Scheduling_Criteria
 
         static unsigned int current_head() { return Machine::cpu_id(); }
     };
+
+    // Global Feedback
+    class GFS: public FS
+    {
+    public:
+        static const unsigned int HEADS = Traits<Machine>::CPUS;
+
+    public:
+        GFS(int p = NORMAL): FS(p) {}
+
+        static unsigned int current_head() { return Machine::cpu_id(); }
+    };
 }
 
 
@@ -162,6 +174,10 @@ public Scheduling_Multilist<T> {};
 
 template<typename T>
 class Scheduling_Queue<T, Scheduling_Criteria::GRR>:
+public Multihead_Scheduling_List<T> {};
+
+template<typename T>
+class Scheduling_Queue<T, Scheduling_Criteria::GFS>:
 public Multihead_Scheduling_List<T> {};
 
 // Scheduler
